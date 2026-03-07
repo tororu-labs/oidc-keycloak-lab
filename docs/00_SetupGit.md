@@ -47,7 +47,7 @@
 
 - README: 作成
 - `.gitignore`: 作成
-- license: なし
+- License: 追加しない
 
 ### この時点の状態
 
@@ -138,7 +138,7 @@ GitHub の以下画面から公開鍵を登録した。
 - Title: 使用端末を識別できる名前など（例: `MacBook Pro 2020`）
 - Key type: `Authentication Key`
 - Key: `id_ed25519.pub` の内容をそのままペースト
-- `id_ed25519.pub`は`ssh-25519 AAAA... your_email@example.com`>の形になる
+- `id_ed25519.pub`は`ssh-ed25519 AAAA... your_email@example.com`の形になる
 
 ------
 
@@ -150,7 +150,7 @@ GitHub の以下画面から公開鍵を登録した。
 ssh -T git@github.com
 ~~~
 
-初回接続時にはホスト確認が表示されるため、`yes` を入力した。
+初回接続時にはホスト確認が表示されることがあるため、内容を確認して `yes` を入力した。
 `Are you sure you want to continue connecting (yes/no/[fingerprint])?`
 
 正常時の例:
@@ -189,6 +189,8 @@ git remote -v
 git branch
 ls -la
 ~~~
+
+ここでは、現在の作業ディレクトリ、リモート接続先、ブランチも合わせて確認した。
 
 この時点で、GitHub リポジトリと接続されたローカル作業ディレクトリができた。
 
@@ -230,6 +232,7 @@ iam-lab-study/
   - Keycloak、DB、Docker Compose などの構成ファイル
 - `scratch/`
   - 一時作業用の置き場
+  - commit 前に中身を確認し、残したいものだけを管理する想定
 
 ------
 
@@ -240,6 +243,7 @@ git status
 ~~~
 
 この時点では、新しく作成したディレクトリ群が `Untracked files` として表示された。
+この確認のタイミングで、意図しないファイルが混ざっていないかも合わせて見た。
 
 ------
 
@@ -250,6 +254,8 @@ git status
 ~~~zsh
 git add .
 ~~~
+
+今回は `git add .` を使ったが、実行前に `git status` で対象を確認してから進めた。
 
 ### commit
 
@@ -310,7 +316,7 @@ mkdir -p docs notes apps infra scratch #初期ディレクトリ構成の作成
 touch docs/.gitkeep notes/.gitkeep apps/.gitkeep infra/.gitkeep scratch/.gitkeep #用途ごとのディレクトリの作成
 
 git status #状態確認
-git add . #変更をステージング
+git add . #変更をステージング（実行前に git status で対象を確認）
 git commit -m "chore: initialize local IAM lab structure" #変更をコミット
 git push origin main #変更をリモートに push
 ~~~
