@@ -51,11 +51,11 @@ iam-lab-study/
 
 - [docs/00_SetupGitHubRepository.md](docs/00_SetupGitHubRepository.md)  
   GitHub リポジトリ作成、SSH 鍵設定、ローカル clone、初期ディレクトリ作成までの記録
-- [notes/01_GitBasicFlow.md](notes/01_GitBasicFlow.md)  
+- [notes/01_Git/01_GitBasicFlow.md](notes/01_Git/01_GitBasicFlow.md)  
   Git の基本的な作業フローを整理したメモ
-- [notes/02_GitCommitMessage.md](notes/02_GitCommitMessage.md)  
+- [notes/01_Git/02_GitCommitMessage.md](notes/01_Git/02_GitCommitMessage.md)  
   コミットメッセージの書き方をまとめたメモ
-- [notes/03_GitStateFlow.md](notes/03_GitStateFlow.md)  
+- [notes/01_Git/03_GitStateFlow.md](notes/01_Git/03_GitStateFlow.md)  
   作業ツリー、ステージング、ローカルブランチ、リモートの関係を整理したメモ
 
 セットアップの詳細コマンドは README に再掲せず、上記の `docs/` 配下ドキュメントにまとめています。
