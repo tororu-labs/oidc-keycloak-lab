@@ -1,4 +1,4 @@
-# venv環境のsetup
+# Setup Python Virtual Environment (venv)
 
 ## 目的
 
@@ -10,25 +10,25 @@
 ## 事前準備
 
 - Python がインストールされていることを確認する。
-  - ターミナルで `python --version` または `python3 --version` を実行して、Python のバージョンを確認する。
+  - ターミナルで `python3 --version` を実行して、Python のバージョンを確認する。
+  - 今回は、`Python 3.12.12` が表示された。
 
 ## 仮想環境の作成
 
 - プロジェクトのルートディレクトリに移動する。
   - 例: `cd ~/Projects/iam-lab-study`
 - `venv` を使用して仮想環境を作成する。
-  - コマンド: `python -m venv .venv`
+  - コマンド: `python3 -m venv .venv`
   - これにより、プロジェクト内に `.venv` という名前の仮想環境が作成される。
 - 仮想環境をアクティブにする。
-  - macOS/Linux: `source .venv/bin/activate`
-  - Windows: `.venv\Scripts\activate`
+  - macOS: `source .venv/bin/activate`
 - 仮想環境がアクティブになっていることを確認する。
   - ターミナルのプロンプトに `(.venv)` が表示される。
-  - `which python` または `where python` を実行して、仮想環境内の Python が使用されていることを確認する.  
+  - `which python` を実行して、仮想環境内の Python が使用されていることを確認する。  
 
 ~~~zsh
 cd ~/Projects/iam-lab-study
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate # 仮想環境のアクティベート
 which python
 ~~~
@@ -41,11 +41,11 @@ which python
   - 今回は、`iam-lab-study/.venv/bin/python` を選択する。
 - これにより、VSCode 内で Python コードを実行する際に、仮想環境が使用されるようになる。
 - 必要に応じて、VSCode のターミナルも仮想環境を使用するように設定することができる。
-- ターミナルで `python --version` を実行して、VSCode のターミナルが仮想環境を使用していることを確認する。
-  - 今回は、`Python 3.12.12` が表示される。
+- ターミナルで `which python` を実行して、VSCode のターミナルが仮想環境を使用していることを確認する。
+  - 今回は、`${workspaceFolder}/.venv/bin/python` が使われる状態にする。
 - VSCode の設定ファイル（`settings.json`）に、仮想環境のパスを明示的に指定することもできる。
-  - 例: `"python.pythonPath": "${workspaceFolder}/.venv/bin/python"`
-  - これにより、VSCode が常にプロジェクトの仮想環境を使用するようになる。
+  - 今回は、`python.defaultInterpreterPath` を設定する。
+  - これにより、VSCode がプロジェクトの仮想環境を使用するようになる。
 
 ### 補足
 
