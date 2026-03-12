@@ -1,4 +1,4 @@
-# 00_Setup GitHub Repository
+# Setup GitHub Repository
 
 ## 目的
 
@@ -277,7 +277,7 @@ git push origin main
 
 ------
 
-## この時点で完了したこと
+## 本ドキュメントで完了したこと
 
 以下が完了した状態になった。
 
