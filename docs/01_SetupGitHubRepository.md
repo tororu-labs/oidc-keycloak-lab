@@ -49,7 +49,7 @@
 - `.gitignore`: 作成
 - License: 追加しない
 
-### この時点の状態
+### GitHub リポジトリ作成時の状態
 
 GitHub 上に空のリポジトリができ、`README.md` と `.gitignore` を含む初回コミットが存在する状態になった。
 
@@ -159,7 +159,7 @@ ssh -T git@github.com
 Hi tororu-labs! You've successfully authenticated, but GitHub does not provide shell access.
 ~~~
 
-### 判定
+### SSH 接続確認の判定
 
 このメッセージが表示されたため、SSH 認証は正常に完了していると判断した。
 

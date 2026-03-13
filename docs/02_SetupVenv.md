@@ -42,7 +42,7 @@ python3 --version
 
 実施時点では、`Python 3.12.12` が表示された。
 
-### 判定
+### Python の確認の判定
 
 `python3 --version` が成功し、Python 3 のバージョンが表示されたため、`venv` を使った仮想環境作成を進められると判断した。
 
@@ -57,7 +57,7 @@ cd ~/Projects/iam-lab-study
 python3 -m venv .venv
 ~~~
 
-### この時点の状態
+### 仮想環境の作成完了時の状態
 
 プロジェクト直下に `.venv` ディレクトリが作成され、IAM Study Lab 専用の Python 実行環境が用意された。
 
@@ -111,7 +111,7 @@ cat > .vscode/settings.json <<'EOF'
 EOF
 ~~~
 
-### 補足
+### `settings.json` の作成の補足
 
 - `python.defaultInterpreterPath` は、VSCode が既定で使う Python を `.venv` に固定するための設定である。
 - `python.terminal.activateEnvironment` は、VSCode 内のターミナル起動時に仮想環境を有効化しやすくするための設定である。

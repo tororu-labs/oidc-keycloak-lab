@@ -51,7 +51,7 @@ docker compose version
 docker run hello-world
 ~~~
 
-### 判定
+### Docker Desktop の利用確認の判定
 
 `docker version` と `docker compose version` が表示され、`docker run hello-world` が成功したため、Docker 環境は正常に利用できると判断した。
 
@@ -74,7 +74,7 @@ EOF
 
 この `.env` ファイルには秘密情報が含まれるため、本番環境では環境変数やシークレット管理ツールを使う想定である。今回は学習目的のため、ローカル開発用の簡易構成として扱った。
 
-### この時点の状態
+### `.env` の作成完了時の状態
 
 Keycloak と PostgreSQL が参照するデータベース名、接続ユーザー、初期管理者ユーザーの情報をローカルファイルで管理できる状態になった。
 
@@ -127,7 +127,7 @@ volumes:
 EOF
 ~~~
 
-### 補足
+### `docker-compose.yml` の作成の補足
 
 - `postgres` サービスは `pgdata` volume を利用し、データベースの内容を永続化する構成にした。
 - `keycloak` サービスは `depends_on` と PostgreSQL 側の `healthcheck` を利用し、DB の起動確認後に接続する構成にした。
