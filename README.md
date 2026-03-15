@@ -26,6 +26,7 @@ OIDC、OAuth 2.0、Keycloak、セキュリティアーキテクチャを段階�
 - Docker Compose を使って Keycloak と PostgreSQL を起動するための構成
 - Keycloak GUI で `realm / user / role / client` を作成し、token 差分を確認する手順
 - FastAPI を使って Keycloak の OIDC ログインを試す最小検証アプリ
+- 手順書どおりの実施内容をターミナルログとして残すための `scripts/doclog.zsh`
 - Git の基本フロー、コミットメッセージ、状態遷移に関する学習メモ
 - Docker Compose と Keycloak の学習メモ
 - 個人用の作業メモ置き場としての `scratch/`
@@ -45,6 +46,36 @@ OIDC、OAuth 2.0、Keycloak、セキュリティアーキテクチャを段階�
 4. 最後に `README.md` へ現在の進捗と主要ドキュメントを反映する
 
 この役割分担により、`README.md` は入口と全体要約、`docs/` は再現しやすい手順書や参照用の整った文書、`notes/` は学習途中の記録や整理メモとして使い分ける。
+
+## 手順ログの残し方
+
+`docs/` の手順を実施するときは、[`scripts/doclog.zsh`](scripts/doclog.zsh) を使うと、ターミナルで実行したコマンド、レスポンス、途中メモをまとめて `scratch/logs/` に残せる。
+
+基本の使い方は以下。
+
+```zsh
+source scripts/doclog.zsh
+doclog docs/05_SetupFastAPI-OIDCLogin.md
+```
+
+ログ用シェルに入ったあとは、必要に応じて `note` でメモを残す。
+
+```zsh
+note 'Step 1: demo-bff client を作成'
+note '手動操作: Credentials タブで client secret を確認'
+exit
+```
+
+- `doclog docs/04_SetupKeycloak.md` のように手順書のパスを渡すと、対応する名前で `scratch/logs/` 配下にログが作成される
+- `note '...'` は画面表示とログの両方に残るため、手動操作や確認ポイントの記録に向いている
+- `OIDC_CLIENT_SECRET` などの秘密情報は `echo` せず、必要なら `read -s` で入力する
+- 生ログには秘密情報や一時的な値が含まれる可能性があるため、`scratch/logs/` は基本的にコミット対象にしない
+
+必要なら、個人のシェル設定で次のような alias を作り、`doclog` を短く呼び出すこともできる。
+
+```zsh
+alias dlog='zsh scripts/doclog.zsh'
+```
 
 ## ディレクトリ構成
 
@@ -70,6 +101,8 @@ iam-lab-study/
 │   ├── 01_Git/
 │   ├── 02_Docker/
 │   └── 03_Keycloak/
+├── scripts/
+│   └── doclog.zsh
 └── scratch/
 ```
 
@@ -79,6 +112,7 @@ iam-lab-study/
 - `notes/01_Git/`: Git の基本操作やコミット運用に関する学習メモ
 - `notes/02_Docker/`: Docker Compose の見直しやライフサイクルに関するメモ
 - `notes/03_Keycloak/`: token 比較など Keycloak の学習メモ
+- `scripts/`: 手順書実施時のログ取得を補助するスクリプトを置くディレクトリ
 - `scratch/`: 一時メモや作業途中の内容を置くローカル補助ディレクトリ
 
 ローカル作業用として `.venv/`、`.vscode/`、`infra/keycloak/.env` も存在するが、上の構成図では主な内容だけを示している。
