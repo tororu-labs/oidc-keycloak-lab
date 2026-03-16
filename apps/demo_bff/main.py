@@ -10,9 +10,10 @@ from html import escape
 from typing import Any
 from urllib.parse import urlencode, urlparse
 
+import httpx
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 
@@ -27,6 +28,8 @@ class Settings:
     oidc_client_id: str
     oidc_client_secret: str
     app_base_url: str
+    backend_api_base_url: str
+    backend_api_timeout_seconds: float
     session_secret: str
     session_cookie_name: str
     session_ttl_seconds: int
@@ -91,6 +94,7 @@ class InMemorySessionStore:
 def load_settings() -> tuple[Settings, list[str]]:
     keycloak_base_url = os.getenv("KEYCLOAK_BASE_URL", "http://localhost:8080").rstrip("/")
     app_base_url = os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
+    backend_api_base_url = os.getenv("BACKEND_API_BASE_URL", "http://localhost:8001").rstrip("/")
     oidc_client_secret = os.getenv("OIDC_CLIENT_SECRET", DEFAULT_CLIENT_SECRET)
     session_secret = os.getenv("SESSION_SECRET", DEFAULT_SESSION_SECRET)
 
@@ -100,6 +104,8 @@ def load_settings() -> tuple[Settings, list[str]]:
         oidc_client_id=os.getenv("OIDC_CLIENT_ID", "demo-bff"),
         oidc_client_secret=oidc_client_secret,
         app_base_url=app_base_url,
+        backend_api_base_url=backend_api_base_url,
+        backend_api_timeout_seconds=float(os.getenv("BACKEND_API_TIMEOUT_SECONDS", "5")),
         session_secret=session_secret,
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "demo_bff"),
         session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "3600")),
@@ -337,6 +343,7 @@ def render_home(
       <li>Callback で token を受け取り session を作ること</li>
       <li><code>/me</code> で user 情報と role を見られること</li>
       <li><code>/admin</code> で <code>admin</code> role を判定できること</li>
+      <li><code>/api/me</code> と <code>/api/admin-data</code> で別 API を Bearer token 付きで呼べること</li>
     </ul>
   </section>
   <section class="card">
@@ -351,6 +358,8 @@ def render_home(
   <a class="button" href="/login">Keycloak でログイン</a>
   <a class="button secondary" href="/me">/me を開く</a>
   <a class="button secondary" href="/admin">/admin を開く</a>
+  <a class="button secondary" href="/api/me">/api/me を開く</a>
+  <a class="button secondary" href="/api/admin-data">/api/admin-data を開く</a>
 </div>
 """
         return render_page("FastAPI OIDC Demo", body)
@@ -385,13 +394,16 @@ def render_home(
 <div class="callout">
   <strong>次に見ると理解しやすいポイント</strong>
   <p class="muted">
-    <code>/me</code> で claims を確認し、<code>/admin</code> で role 判定の結果を見比べてください。
+    <code>/me</code> と <code>/admin</code> は BFF 自身の確認、
+    <code>/api/me</code> と <code>/api/admin-data</code> は別 Backend API への代理呼び出しです。
   </p>
 </div>
 <pre>{format_json_block(session_state)}</pre>
 <div class="actions">
   <a class="button" href="/me">/me を開く</a>
   <a class="button secondary" href="/admin">/admin を開く</a>
+  <a class="button secondary" href="/api/me">/api/me を開く</a>
+  <a class="button secondary" href="/api/admin-data">/api/admin-data を開く</a>
   <form method="post" action="/logout">
     <button class="secondary" type="submit">ログアウト</button>
   </form>
@@ -423,6 +435,8 @@ def render_profile_page(session_info: dict[str, Any]) -> HTMLResponse:
 <div class="actions">
   <a class="button" href="/">ホームへ戻る</a>
   <a class="button secondary" href="/admin">/admin を試す</a>
+  <a class="button secondary" href="/api/me">/api/me を開く</a>
+  <a class="button secondary" href="/api/admin-data">/api/admin-data を試す</a>
 </div>
 """
     return render_page("/me", body)
@@ -443,6 +457,7 @@ def render_admin_page(session_info: dict[str, Any]) -> HTMLResponse:
 <div class="actions">
   <a class="button" href="/">ホームへ戻る</a>
   <a class="button secondary" href="/me">/me を開く</a>
+  <a class="button secondary" href="/api/admin-data">/api/admin-data を開く</a>
 </div>
 """
     return render_page("/admin", body)
@@ -495,6 +510,52 @@ def get_active_session(request: Request) -> dict[str, Any] | None:
     if session_info is None and session_id:
         request.session.clear()
     return session_info
+
+
+async def proxy_backend_api(session_info: dict[str, Any], path: str) -> JSONResponse:
+    access_token = session_info.get("access_token")
+    if not access_token:
+        return JSONResponse(
+            {
+                "detail": "session から access token を取得できませんでした。",
+                "path": path,
+            },
+            status_code=500,
+        )
+
+    target_url = f"{settings.backend_api_base_url}{path}"
+    try:
+        async with httpx.AsyncClient(timeout=settings.backend_api_timeout_seconds) as client:
+            response = await client.get(
+                target_url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+            )
+    except httpx.RequestError as exc:
+        return JSONResponse(
+            {
+                "detail": "Backend API への接続に失敗しました。",
+                "backend_url": target_url,
+                "error": str(exc),
+            },
+            status_code=502,
+        )
+
+    try:
+        backend_response = response.json()
+    except ValueError:
+        backend_response = {"raw_text": response.text}
+
+    payload = {
+        "via": "demo-bff",
+        "proxy_user": session_info["user"]["preferred_username"],
+        "backend_url": target_url,
+        "backend_status": response.status_code,
+        "backend_response": backend_response,
+    }
+    return JSONResponse(payload, status_code=response.status_code)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -578,6 +639,22 @@ async def admin(request: Request):
         )
         return render_error_page("403 Forbidden", message, 403)
     return render_admin_page(session_info)
+
+
+@app.get("/api/me", response_model=None)
+async def api_me(request: Request) -> JSONResponse | RedirectResponse:
+    session_info = get_active_session(request)
+    if session_info is None:
+        return RedirectResponse("/login?next=/api/me", status_code=303)
+    return await proxy_backend_api(session_info, "/me")
+
+
+@app.get("/api/admin-data", response_model=None)
+async def api_admin_data(request: Request) -> JSONResponse | RedirectResponse:
+    session_info = get_active_session(request)
+    if session_info is None:
+        return RedirectResponse("/login?next=/api/admin-data", status_code=303)
+    return await proxy_backend_api(session_info, "/admin-data")
 
 
 @app.post("/logout")

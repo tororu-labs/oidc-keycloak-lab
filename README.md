@@ -2,14 +2,14 @@
 
 IAM を学ぶための個人用ラボリポジトリです。  
 OIDC、OAuth 2.0、Keycloak、セキュリティアーキテクチャを段階的に整理していく土台として使っています。  
-現時点では Git / GitHub の理解メモ、Python 仮想環境の整備、Docker を使った Keycloak の初期導入、Keycloak GUI の基本設定、FastAPI を使った最小 OIDC ログイン検証までを進めています。
+現時点では Git / GitHub の理解メモ、Python 仮想環境の整備、Docker を使った Keycloak の初期導入、Keycloak GUI の基本設定、FastAPI を使った最小 OIDC ログイン検証、FastAPI 同士の BFF / Backend API 分離までを進めています。
 
 ## リポジトリ概要
 
 このリポジトリは、IAM 関連技術を手を動かしながら学ぶための学習記録置き場です。
 
 今は Git / GitHub、Python 開発環境、Keycloak のローカル起動環境を順番に整えながら、README を含むドキュメントを読み返せば状態を追える構成にしています。  
-まだ最終構成の SPA / BFF / Backend API には進んでおらず、まずは OIDC ログインと role ベース認可の最小形を把握する段階です。
+FastAPI ベースでの OIDC ログインと BFF / Backend API の最小分離までは進めており、次は Next.js を足して SPA / BFF 構成へ広げる段階です。
 
 ## 学習テーマ
 
@@ -26,12 +26,13 @@ OIDC、OAuth 2.0、Keycloak、セキュリティアーキテクチャを段階�
 - Docker Compose を使って Keycloak と PostgreSQL を起動するための構成
 - Keycloak GUI で `realm / user / role / client` を作成し、token 差分を確認する手順
 - FastAPI を使って Keycloak の OIDC ログインを試す最小検証アプリ
+- FastAPI の BFF から別 FastAPI API へ Access Token を渡し、JWT 検証付きで保護する最小検証アプリ
 - 手順書どおりの実施内容をターミナルログとして残すための `scripts/doclog.zsh`
 - Git の基本フロー、コミットメッセージ、状態遷移に関する学習メモ
 - Docker Compose と Keycloak の学習メモ
 - 個人用の作業メモ置き場としての `scratch/`
 
-一方で、BFF と Backend API の分離、JWT 検証付き API 保護、Next.js 連携はまだこれからです。  
+一方で、Next.js 連携や audience 検証、より実務寄りの token / session 保持方式はまだこれからです。
 この README は、その途中状態を表す中間版として記載しています。
 
 ## この repo の進め方
@@ -83,6 +84,10 @@ alias dlog='zsh scripts/doclog.zsh'
 iam-lab-study/
 ├── README.md
 ├── apps/
+│   ├── demo_api/
+│   │   ├── .env.example
+│   │   ├── main.py
+│   │   └── requirements.txt
 │   └── demo_bff/
 │       ├── .env.example
 │       ├── main.py
@@ -93,6 +98,7 @@ iam-lab-study/
 │   ├── 03_SetupDocker-Keycloak.md
 │   ├── 04_SetupKeycloak.md
 │   ├── 05_SetupFastAPI-OIDCLogin.md
+│   ├── 06_SetupFastAPI-BackendAPI.md
 │   └── _TEMPLATE.md
 ├── infra/
 │   └── keycloak/
@@ -106,7 +112,7 @@ iam-lab-study/
 └── scratch/
 ```
 
-- `apps/`: 検証用アプリを置くディレクトリ。現時点では FastAPI による最小 OIDC ログイン検証アプリを配置
+- `apps/`: 検証用アプリを置くディレクトリ。現時点では FastAPI による BFF と Backend API の最小検証アプリを配置
 - `docs/`: セットアップ手順や今後の構成資料を置くディレクトリ
 - `infra/keycloak/`: Keycloak と PostgreSQL を Docker Compose で起動するための構成を置くディレクトリ
 - `notes/01_Git/`: Git の基本操作やコミット運用に関する学習メモ
@@ -129,6 +135,8 @@ iam-lab-study/
   Keycloak GUI で `realm / role / user / client` を作成し、token 差分を確認する手順
 - [docs/05_SetupFastAPI-OIDCLogin.md](docs/05_SetupFastAPI-OIDCLogin.md)  
   FastAPI を使って Keycloak の OIDC ログインを実アプリから試す最小ハンズオン
+- [docs/06_SetupFastAPI-BackendAPI.md](docs/06_SetupFastAPI-BackendAPI.md)
+  FastAPI の BFF から別 FastAPI API へ Access Token を渡し、JWT 検証付き API 保護を確認するハンズオン
 - [notes/01_Git/01_GitBasicFlow.md](notes/01_Git/01_GitBasicFlow.md)  
   Git の基本的な作業フローを整理したメモ
 - [notes/01_Git/02_GitCommitMessage.md](notes/01_Git/02_GitCommitMessage.md)  
@@ -152,14 +160,14 @@ iam-lab-study/
 - Keycloak の GUI で `lab` realm、`alice / bob`、`viewer / admin`、`demo-web` を作成済み
 - `alice` と `bob` の token 差分を確認済み
 - `apps/demo_bff/` に FastAPI ベースの最小 OIDC ログイン検証アプリを追加済み
+- `apps/demo_api/` に JWT 検証付き Backend API を追加済み
 - Git の基本操作を理解するためのノートを作成済み
 - 学習用のディレクトリ構成を作成済み
-- FastAPI 単体での OIDC ログインと role ベース認可は進めたが、BFF/API 分離と JWT 検証は未着手
+- FastAPI ベースでの BFF / Backend API 分離と JWT 検証は進めたが、Next.js 連携と audience 検証は未着手
 
 ## 今後の予定
 
-- `apps/` に BFF と Backend API を分離した検証アプリを追加する
-- FastAPI から別 API へ Access Token を渡し、JWT 検証を行う
 - Next.js を追加し、SPA / BFF 構成へ段階的に進める
+- Backend API 側に audience 検証や失敗系ハンズオンを追加する
 - IAM / OIDC / OAuth 2.0 の学習メモを増やす
 - 学習内容を README や関連ドキュメントへ継続的に反映する
