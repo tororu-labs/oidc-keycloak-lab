@@ -244,14 +244,130 @@ FastAPI はローカル session を削除し、その後 Keycloak の logout end
 - logout 後にトップページへ戻る
 - `/me` または `/admin` を開くと再ログインが必要になる
 
-### Keycloak 停止時の確認
+### 失敗系確認の前提
 
-Keycloak を停止した状態で `/auth/callback` の token 交換が必要になると、FastAPI はエラーページを表示する。
+失敗系を確認するときは、`uvicorn` を起動したターミナルを表示したままにし、ブラウザの画面と FastAPI 側のログをあわせて確認する。  
+また、確認後は変更した環境変数を元に戻し、最後に `Ctrl+C` で `uvicorn` を停止する。
+
+------
+
+### 失敗例 1: Keycloak 停止
+
+目的:
+
+Keycloak が停止していると、OIDC ログインフローのどこで失敗するかが変わることを確認する。
+
+再現方法:
+
+- Keycloak を停止した状態で `/login` を試す
+- または、ログイン途中や logout 前後で Keycloak を停止して挙動を確認する
 
 期待する見え方:
 
-- `Token 交換エラー` として画面に表示される
-- Keycloak 停止、client secret 相違、redirect URI 不一致などの切り分けヒントが表示される
+- ブラウザ:
+  - Keycloak へ遷移できない
+  - 接続失敗や到達不可になる
+  - タイミングによっては logout endpoint 接続失敗になる
+- `uvicorn` ログ:
+  - `/login` のあとに Keycloak へ進めない
+  - または callback / logout 周辺で失敗する
+
+補足:
+
+- 失敗位置は Keycloak を停止したタイミングに依存する
+- そのため、`/auth/callback` の token 交換失敗だけを狙って再現する項目としては扱いにくい
+- 学習用としては、「Keycloak が止まるとログイン開始、callback、logout のどこかで失敗する」と理解できれば十分である
+
+判定:
+
+以下のいずれかを確認できればよい。
+
+- Keycloak へ遷移できず接続失敗になる
+- callback 後に `OIDC callback エラー` または `Token 交換エラー` になる
+- logout 時に Keycloak の logout endpoint へ接続できず失敗する
+
+------
+
+### 失敗例 2: `redirect_uri` 不一致
+
+目的:
+
+Keycloak が `redirect_uri` を厳密に確認しており、不一致の場合は認可開始時点で拒否することを確認する。
+
+再現方法:
+
+FastAPI 側の `APP_BASE_URL` を、Keycloak に登録した redirect URI と一致しない値へ変更する。
+
+例:
+
+~~~zsh
+export APP_BASE_URL=http://127.0.0.1:8000
+~~~
+
+期待する見え方:
+
+- ブラウザ:
+  - Keycloak 画面で `Invalid parameter: redirect_uri` が表示される
+- `uvicorn` ログ:
+  - `/login` へのアクセスは記録される
+  - `/auth/callback` へのアクセスは発生しない
+
+補足:
+
+- これは token 交換エラーではなく、認可開始時点での不一致エラーである
+- `redirect_uri` は OIDC の安全性に関わる重要な設定である
+- Keycloak は `Valid redirect URIs` と一致するかを確認している
+
+判定:
+
+以下を確認できればよい。
+
+- Keycloak 画面で `Invalid parameter: redirect_uri` が表示される
+- `/auth/callback` までは到達しない
+
+------
+
+### 失敗例 3: `client secret` 不一致
+
+目的:
+
+`client secret` が一致しない場合、ログイン画面までは進めても callback 後の認可処理で失敗することを確認する。
+
+再現方法:
+
+FastAPI 側の `OIDC_CLIENT_SECRET` を、Keycloak の `demo-bff` client secret と異なる値へ変更する。
+
+例:
+
+~~~zsh
+export APP_BASE_URL=http://localhost:8000
+export OIDC_CLIENT_SECRET='本来のsecretを少し変えた値'
+~~~
+
+期待する見え方:
+
+- ブラウザ:
+  - `/auth/callback` 後に `OIDC callback エラー` が表示される
+  - `error='unauthorized_client'`
+  - `description='Invalid client or Invalid client credentials'`
+- `uvicorn` ログ:
+  - `/auth/callback` へのアクセスが記録される
+  - `GET /auth/callback HTTP/1.1" 400` のようなログが出ることがある
+
+補足:
+
+- これは `redirect_uri` 不一致より一段後ろで起きる
+- `/login` と Keycloak のログイン画面までは進める
+- callback 後の token 交換または認可処理で、client 認証に失敗している
+
+判定:
+
+以下を確認できればよい。
+
+- Keycloak のログイン画面までは進める
+- `/auth/callback` 後に FastAPI 側で `OIDC callback エラー` が表示される
+- `unauthorized_client` または `Invalid client credentials` を確認できる
+- `uvicorn` のログに `/auth/callback` への `400` が出ることを確認できる
 
 ------
 
