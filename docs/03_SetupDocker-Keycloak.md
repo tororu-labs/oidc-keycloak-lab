@@ -161,7 +161,9 @@ docker compose up -d
 docker compose ps
 ~~~
 
-起動時の衝突や既存 resource の扱いについては、`notes/02_DockerKeycloak/00_ComposeFile.md` に整理した。
+起動時の衝突や既存 resource の扱いについては `notes/02_Docker/MEMO_ComposeFileTroubleshooting.md`、
+`up / down / down -v` の違いは `notes/02_Docker/01_ComposeLifecycle.md`、
+デバッグ時の確認観点は `notes/02_Docker/02_DebugChecklist.md` に整理した。
 
 ### コンテナ起動の判定
 

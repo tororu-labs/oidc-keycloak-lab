@@ -143,6 +143,14 @@ iam-lab-study/
   コミットメッセージの書き方をまとめたメモ
 - [notes/01_Git/03_GitStateFlow.md](notes/01_Git/03_GitStateFlow.md)  
   作業ツリー、ステージング、ローカルブランチ、リモートの関係を整理したメモ
+- [notes/02_Docker/01_ComposeLifecycle.md](notes/02_Docker/01_ComposeLifecycle.md)
+  Docker Compose の `up / stop / start / down / down -v` を整理したメモ
+- [notes/02_Docker/02_DebugChecklist.md](notes/02_Docker/02_DebugChecklist.md)
+  Docker / Compose / Keycloak 起動不良の切り分け観点を整理したメモ
+- [notes/02_Docker/03_RecreateReset.md](notes/02_Docker/03_RecreateReset.md)
+  再起動、再作成、初期化の判断を整理したメモ
+- [notes/02_Docker/04_PortsEnvVolumes.md](notes/02_Docker/04_PortsEnvVolumes.md)
+  ports、`.env`、volume の考え方を整理したメモ
 - [notes/02_Docker/MEMO_ComposeFileTroubleshooting.md](notes/02_Docker/MEMO_ComposeFileTroubleshooting.md)  
   Docker Compose の設定見直しと名前衝突対応のメモ
 - [notes/03_Keycloak/MEMO_CompareTokensUsers.md](notes/03_Keycloak/MEMO_CompareTokensUsers.md)  
