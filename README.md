@@ -25,11 +25,12 @@ FastAPI ベースでの OIDC ログインと BFF / Backend API の最小分離�
 - Python の `venv` と VSCode 設定に関するセットアップ記録
 - Docker Compose を使って Keycloak と PostgreSQL を起動するための構成
 - Keycloak GUI で `realm / user / role / client` を作成し、token 差分を確認する手順
+- OIDC 一般論と Keycloak 固有の概念を分けて整理する学習メモ
 - FastAPI を使って Keycloak の OIDC ログインを試す最小検証アプリ
 - FastAPI の BFF から別 FastAPI API へ Access Token を渡し、JWT 検証付きで保護する最小検証アプリ
 - 手順書どおりの実施内容をターミナルログとして残すための `scripts/doclog.zsh`
 - Git の基本フロー、コミットメッセージ、状態遷移に関する学習メモ
-- Docker Compose と Keycloak の学習メモ
+- Docker Compose、Keycloak、OIDC の学習メモ
 - 個人用の作業メモ置き場としての `scratch/`
 
 一方で、Next.js 連携や audience 検証、より実務寄りの token / session 保持方式はまだこれからです。
@@ -106,7 +107,8 @@ iam-lab-study/
 ├── notes/
 │   ├── 01_Git/
 │   ├── 02_Docker/
-│   └── 03_Keycloak/
+│   ├── 03_Keycloak/
+│   └── 04_OIDC/
 ├── scripts/
 │   └── doclog.zsh
 └── scratch/
@@ -117,7 +119,8 @@ iam-lab-study/
 - `infra/keycloak/`: Keycloak と PostgreSQL を Docker Compose で起動するための構成を置くディレクトリ
 - `notes/01_Git/`: Git の基本操作やコミット運用に関する学習メモ
 - `notes/02_Docker/`: Docker Compose の見直しやライフサイクルに関するメモ
-- `notes/03_Keycloak/`: token 比較など Keycloak の学習メモ
+- `notes/03_Keycloak/`: Keycloak の realm / client / role / token 出力に寄った学習メモ
+- `notes/04_OIDC/`: OIDC / OAuth 2.0 の一般概念に寄った学習メモ
 - `scripts/`: 手順書実施時のログ取得を補助するスクリプトを置くディレクトリ
 - `scratch/`: 一時メモや作業途中の内容を置くローカル補助ディレクトリ
 
@@ -153,8 +156,22 @@ iam-lab-study/
   ports、`.env`、volume の考え方を整理したメモ
 - [notes/02_Docker/MEMO_ComposeFileTroubleshooting.md](notes/02_Docker/MEMO_ComposeFileTroubleshooting.md)  
   Docker Compose の設定見直しと名前衝突対応のメモ
+- [notes/03_Keycloak/01_RealmClientRoleScope.md](notes/03_Keycloak/01_RealmClientRoleScope.md)
+  Keycloak の `realm / client / role / client scope` の関係を整理したメモ
+- [notes/03_Keycloak/02_ClientScopeMapper.md](notes/03_Keycloak/02_ClientScopeMapper.md)
+  Keycloak の `client scope` と `mapper` が token 出力にどう効くかを整理したメモ
+- [notes/03_Keycloak/03_KeycloakTroubleshooting.md](notes/03_Keycloak/03_KeycloakTroubleshooting.md)
+  Keycloak GUI 設定で詰まりやすいポイントを整理したメモ
 - [notes/03_Keycloak/MEMO_CompareTokensUsers.md](notes/03_Keycloak/MEMO_CompareTokensUsers.md)  
   `alice` と `bob` の token 比較メモ
+- [notes/04_OIDC/01_AuthorizationCodeFlow.md](notes/04_OIDC/01_AuthorizationCodeFlow.md)
+  Authorization Code Flow の全体像を整理したメモ
+- [notes/04_OIDC/02_TokenKindsAndClaims.md](notes/04_OIDC/02_TokenKindsAndClaims.md)
+  ID token / access token / refresh token と claim を整理したメモ
+- [notes/04_OIDC/03_RedirectUriStateNonce.md](notes/04_OIDC/03_RedirectUriStateNonce.md)
+  `redirect_uri`、`state`、`nonce` の役割を整理したメモ
+- [notes/04_OIDC/04_PKCEAndConfidentialClient.md](notes/04_OIDC/04_PKCEAndConfidentialClient.md)
+  PKCE と public / confidential client の違いを整理したメモ
 
 セットアップの詳細コマンドは README に再掲せず、上記の `docs/` 配下ドキュメントにまとめています。
 
@@ -167,6 +184,7 @@ iam-lab-study/
 - Docker で PostgreSQL と Keycloak を起動し、管理コンソールの表示確認まで実施済み
 - Keycloak の GUI で `lab` realm、`alice / bob`、`viewer / admin`、`demo-web` を作成済み
 - `alice` と `bob` の token 差分を確認済み
+- Keycloak 固有概念と OIDC 一般概念を分けたノートを追加済み
 - `apps/demo_bff/` に FastAPI ベースの最小 OIDC ログイン検証アプリを追加済み
 - `apps/demo_api/` に JWT 検証付き Backend API を追加済み
 - Git の基本操作を理解するためのノートを作成済み
