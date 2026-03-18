@@ -425,6 +425,7 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 ## 関連ドキュメント
 
 - [docs/04_SetupKeycloak.md](./04_SetupKeycloak.md)
+- [notes/04_OIDC/MEMO_失敗系の状態遷移.md](../notes/04_OIDC/MEMO_失敗系の状態遷移.md)
 - [scratch/OIDC最小ハンズオン理解メモ.md](../scratch/OIDC最小ハンズオン理解メモ.md)
 - [apps/demo_bff/main.py](../apps/demo_bff/main.py)
 
