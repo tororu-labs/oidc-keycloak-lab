@@ -53,7 +53,7 @@ python3 --version
 プロジェクトのルートディレクトリへ移動し、`.venv` という名前で仮想環境を作成した。
 
 ~~~zsh
-cd ~/Projects/iam-lab-study
+cd ~/workspace/labs/iam-lab-study
 python3 -m venv .venv
 ~~~
 
@@ -142,7 +142,7 @@ VSCode を開いたときに、ワークスペース単位で `.venv` を優先�
 
 ~~~zsh
 python3 --version # Python 3 の利用確認
-cd ~/Projects/iam-lab-study # プロジェクトルートへ移動
+cd ~/workspace/labs/iam-lab-study # プロジェクトルートへ移動
 python3 -m venv .venv # 仮想環境の作成
 source .venv/bin/activate # 仮想環境の有効化
 which python # 使用中の Python 確認
