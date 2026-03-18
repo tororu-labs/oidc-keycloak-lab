@@ -73,11 +73,12 @@
 
 ## 依存関係のインストール
 
-プロジェクトルートで仮想環境を有効化し、Backend API 用の依存関係を追加でインストールする。
+プロジェクトルートで仮想環境を有効化し、Backend API 用の依存関係を追加でインストールする。  
+新しいターミナルを開いた直後や、VSCode 上でインストール行だけを単独実行した場合は `python` がシステム環境を向くことがある。`python` がシステム環境を向いていると `externally-managed-environment` になるため、導入コマンドは `.venv` の Python を明示して実行する。
 
 ~~~zsh
 source .venv/bin/activate
-python -m pip install -r apps/demo_api/requirements.txt
+./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt
 ~~~
 
 ### 依存関係のインストールの補足
@@ -89,8 +90,8 @@ python -m pip install -r apps/demo_api/requirements.txt
 
 ### 依存関係のインストールの判定
 
-- `python -m pip install -r apps/demo_api/requirements.txt` が成功する
-- `python -m pip show fastapi authlib uvicorn httpx` で導入を確認できる
+- `./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt` が成功する
+- `./.venv/bin/python -m pip show fastapi authlib uvicorn httpx` で導入を確認できる
 
 ------
 

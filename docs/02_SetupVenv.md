@@ -74,6 +74,8 @@ which python
 
 ターミナルのプロンプトに `(.venv)` が表示され、`which python` の結果が `.venv/bin/python` を指していれば、仮想環境が有効になっていると判断できる。
 
+仮想環境の有効化はターミナルごとに独立している。新しいターミナルを開いた場合や、VSCode 上でコマンドを 1 行だけ単独実行した場合は、実行前に再度 `which python` を確認する。
+
 ### 仮想環境有効化の判定
 
 - プロンプトに `(.venv)` が表示される
@@ -115,6 +117,7 @@ EOF
 
 - `python.defaultInterpreterPath` は、VSCode が既定で使う Python を `.venv` に固定するための設定である。
 - `python.terminal.activateEnvironment` は、VSCode 内のターミナル起動時に仮想環境を有効化しやすくするための設定である。
+- ただし、この設定があってもすべての実行方法で `.venv` が必ず使われるわけではない。パッケージ導入時は `which python` を確認するか、`./.venv/bin/python -m pip ...` のように `.venv` の Python を明示すると確実である。
 
 ### `settings.json` の作成後の状態
 
@@ -146,6 +149,7 @@ cd ~/workspace/labs/iam-lab-study # プロジェクトルートへ移動
 python3 -m venv .venv # 仮想環境の作成
 source .venv/bin/activate # 仮想環境の有効化
 which python # 使用中の Python 確認
+./.venv/bin/python -m pip --version # .venv の pip を明示して確認
 ~~~
 
 ### VSCode 設定ファイル関連

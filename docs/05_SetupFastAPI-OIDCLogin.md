@@ -126,11 +126,12 @@ Keycloak は `demo-bff` を「FastAPI 側の OIDC client」として認識し、
 
 ## 依存関係のインストール
 
-プロジェクトルートで仮想環境を有効化し、依存関係をインストールする。
+プロジェクトルートで仮想環境を有効化し、依存関係をインストールする。  
+新しいターミナルを開いた直後や、VSCode 上でインストール行だけを単独実行した場合は `python` がシステム環境を向くことがあるため、導入コマンドは `.venv` の Python を明示して実行する。
 
 ~~~zsh
 source .venv/bin/activate
-python -m pip install -r apps/demo_bff/requirements.txt
+./.venv/bin/python -m pip install -r apps/demo_bff/requirements.txt
 ~~~
 
 ### 依存関係のインストールの補足
@@ -143,8 +144,8 @@ python -m pip install -r apps/demo_bff/requirements.txt
 
 ### 依存関係のインストールの判定
 
-- `python -m pip install -r apps/demo_bff/requirements.txt` が成功する
-- `python -m pip show fastapi authlib uvicorn` で導入を確認できる
+- `./.venv/bin/python -m pip install -r apps/demo_bff/requirements.txt` が成功する
+- `./.venv/bin/python -m pip show fastapi authlib uvicorn httpx itsdangerous` で導入を確認できる
 
 ------
 
@@ -392,7 +393,7 @@ export OIDC_CLIENT_SECRET='本来のsecretを少し変えた値'
 
 ~~~zsh
 source .venv/bin/activate # 仮想環境を有効化
-python -m pip install -r apps/demo_bff/requirements.txt # 依存関係を導入
+./.venv/bin/python -m pip install -r apps/demo_bff/requirements.txt # 依存関係を導入
 uvicorn main:app --app-dir apps/demo_bff --reload # FastAPI アプリを起動
 ~~~
 
