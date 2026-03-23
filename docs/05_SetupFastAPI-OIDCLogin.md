@@ -111,16 +111,19 @@ Keycloak は `demo-bff` を「FastAPI 側の OIDC client」として認識し、
 - `main.py`
   - FastAPI 本体
   - `/login`、`/auth/callback`、`/me`、`/admin`、`/logout` を提供する
+  - ホーム画面から `/api/me`、`/api/admin-data` への導線も表示する
 - `requirements.txt`
   - 実行に必要な依存関係
 - `.env.example`
   - 必要な環境変数の見本
+  - 次段階の Backend API 呼び出しで使う `BACKEND_API_BASE_URL` も含む
 
 ### FastAPI アプリの構成の補足
 
 - このアプリは案Aの最小構成であり、FastAPI が OIDC client と簡易 BFF を兼ねる
 - token は FastAPI が受け取り、ブラウザとは session cookie ベースでやり取りする
 - session store は最小実装としてアプリ内メモリを使うため、アプリ再起動時にはログイン状態が消える
+- `/api/me` と `/api/admin-data` は Step 06 で使う確認用導線であり、この段階では未使用でもよい
 
 ------
 
@@ -169,6 +172,7 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 - `OIDC_CLIENT_SECRET` は Keycloak の `Credentials` タブで確認した値を使う
 - `SESSION_SECRET` は Cookie 署名用であり、`OIDC_CLIENT_SECRET` とは別物である
 - `KEYCLOAK_REALM=lab` により、既存の `lab` realm をそのまま再利用する
+- `apps/demo_bff/.env.example` には Step 06 用の `BACKEND_API_BASE_URL` もあるが、この段階では手動 `export` しなくてもよい
 
 ### 環境変数の設定完了時の状態
 
@@ -191,6 +195,8 @@ uvicorn main:app --app-dir apps/demo_bff --reload
 
 - `http://localhost:8000` が開く
 - 未ログイン時のトップページに `Keycloak でログイン` ボタンが表示される
+- トップページに `/api/me` と `/api/admin-data` のリンクが見えても、この段階ではまだ使わなくてよい
+  Backend API を起動していないため、開くと `502` になることがある
 - `OIDC_CLIENT_SECRET` と `SESSION_SECRET` が未設定の場合は、設定不足を示すメッセージが表示される
 
 ------
@@ -211,12 +217,13 @@ uvicorn main:app --app-dir apps/demo_bff --reload
 
 ### `bob` で確認すること
 
-1. logout する
-2. 再度 `Keycloak でログイン` を押す
-3. `bob` の資格情報でログインする
-4. `/me` で `preferred_username` が `bob` であることを確認する
-5. role 一覧に `admin` が含まれることを確認する
-6. `/admin` を開き、アクセス成功となることを確認する
+1. `http://localhost:8000/` に戻る
+2. ログイン済み画面の `ログアウト` を押す
+3. 再度 `Keycloak でログイン` を押す
+4. `bob` の資格情報でログインする
+5. `/me` で `preferred_username` が `bob` であることを確認する
+6. role 一覧に `admin` が含まれることを確認する
+7. `/admin` を開き、アクセス成功となることを確認する
 
 ### ログインフロー確認の補足
 
@@ -426,8 +433,8 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 ## 関連ドキュメント
 
 - [docs/04_SetupKeycloak.md](./04_SetupKeycloak.md)
+- [docs/06_SetupFastAPI-BackendAPI.md](./06_SetupFastAPI-BackendAPI.md)
 - [notes/04_OIDC/MEMO_失敗系の状態遷移.md](../notes/04_OIDC/MEMO_失敗系の状態遷移.md)
-- [scratch/OIDC最小ハンズオン理解メモ.md](../scratch/OIDC最小ハンズオン理解メモ.md)
 - [apps/demo_bff/main.py](../apps/demo_bff/main.py)
 
 ------

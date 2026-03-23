@@ -100,19 +100,27 @@ source .venv/bin/activate
 Backend API 側では Keycloak の公開鍵取得先を知るために、Keycloak の URL と realm を設定する。  
 BFF 側では既存の設定に加えて、呼び出し先 Backend API の URL を設定する。
 
-~~~zsh
-source .venv/bin/activate
+`export` した環境変数は、そのコマンドを実行したシェルにしか残らない。
+この手順では Backend API と BFF を別ターミナルで起動するため、必要な値をそれぞれのターミナルで設定する。
+必要に応じて `apps/demo_api/.env.example` と `apps/demo_bff/.env.example` を横に開いて確認すると分かりやすい。
 
-# Backend API 用
+~~~zsh
+# ターミナルA: Backend API 用
+source .venv/bin/activate
 export KEYCLOAK_BASE_URL=http://localhost:8080
 export KEYCLOAK_REALM=lab
+~~~
 
-# BFF 用
+~~~zsh
+# ターミナルB: BFF 用
+source .venv/bin/activate
+export KEYCLOAK_BASE_URL=http://localhost:8080
+export KEYCLOAK_REALM=lab
 export OIDC_CLIENT_ID=demo-bff
 export OIDC_CLIENT_SECRET='Keycloakで確認したclient secret'
 export APP_BASE_URL=http://localhost:8000
 export BACKEND_API_BASE_URL=http://localhost:8001
-export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export SESSION_SECRET="$(./.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
 ~~~
 
 ### 環境変数の設定の補足
@@ -120,6 +128,7 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 - `BACKEND_API_BASE_URL` は BFF が proxy 先を決めるために使う
 - Backend API は `OIDC_CLIENT_SECRET` を使わない
 - `SESSION_SECRET` は BFF 側だけで利用する
+- 別ターミナルを新しく開いた場合は、そのターミナルでも必要な `export` をやり直す
 
 ------
 
@@ -128,6 +137,7 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 まず Backend API を起動する。
 
 ~~~zsh
+# 上の「ターミナルA」で実行する
 source .venv/bin/activate
 uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 ~~~
@@ -147,6 +157,7 @@ uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 Backend API と BFF は別ターミナルで同時に起動し、どちらの `uvicorn` ログも確認できる状態にしておく。
 
 ~~~zsh
+# 上の「ターミナルB」で実行する
 source .venv/bin/activate
 uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 ~~~
@@ -155,6 +166,7 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 
 - `docs/05_SetupFastAPI-OIDCLogin.md` と同じ `demo-bff` client をそのまま使う
 - `/api/me` と `/api/admin-data` は BFF の session を見てから Backend API を呼び出す
+- BFF 用ターミナルでは `OIDC_CLIENT_SECRET` と `SESSION_SECRET` が設定済みであることを確認する
 - 確認後は両方の `uvicorn` を `Ctrl+C` で停止する
 
 ------
@@ -177,20 +189,22 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 
 ### `bob` で確認すること
 
-1. logout する
-2. 再度 `Keycloak でログイン` を押して `bob` でログインする
-3. `http://localhost:8000/api/me` を開く
-4. `backend_status` が `200` であることを確認する
-5. `backend_response.user.preferred_username` が `bob` であることを確認する
-6. `backend_response.user.roles` に `admin` が含まれることを確認する
-7. `http://localhost:8000/api/admin-data` を開く
-8. `backend_status` が `200` であることを確認する
+1. `http://localhost:8000/` に戻る
+2. ログイン済みトップページの `ログアウト` を押す
+3. 再度 `Keycloak でログイン` を押して `bob` でログインする
+4. `http://localhost:8000/api/me` を開く
+5. `backend_status` が `200` であることを確認する
+6. `backend_response.user.preferred_username` が `bob` であることを確認する
+7. `backend_response.user.roles` に `admin` が含まれることを確認する
+8. `http://localhost:8000/api/admin-data` を開く
+9. `backend_status` が `200` であることを確認する
 
 ### API アクセスフロー確認の補足
 
 - `/api/me` は BFF 自体の `/me` とは異なり、Backend API が JWT を検証した結果を返す
 - `/api/admin-data` は Backend API 側で `admin` role を要求する
 - BFF は access token を転送するだけで、JWT の署名検証は Backend API 側で行う
+- `/api/*` のレスポンスは JSON なので、ユーザー切り替え時はいったんトップページへ戻って `ログアウト` を押す
 
 ### API アクセスフロー確認の判定
 
