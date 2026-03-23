@@ -51,33 +51,8 @@ FastAPI ベースでの OIDC ログインと BFF / Backend API の最小分離�
 
 ## 手順ログの残し方
 
-`docs/` の手順を実施するときは、[`scripts/doclog.zsh`](scripts/doclog.zsh) を使うと、ターミナルで実行したコマンド、レスポンス、途中メモをまとめて `scratch/logs/` に残せる。
-
-基本の使い方は以下。
-
-```zsh
-source scripts/doclog.zsh
-doclog docs/05_SetupFastAPI-OIDCLogin.md
-```
-
-ログ用シェルに入ったあとは、必要に応じて `note` でメモを残す。
-
-```zsh
-note 'Step 1: demo-bff client を作成'
-note '手動操作: Credentials タブで client secret を確認'
-exit
-```
-
-- `doclog docs/04_SetupKeycloak.md` のように手順書のパスを渡すと、対応する名前で `scratch/logs/` 配下にログが作成される
-- `note '...'` は画面表示とログの両方に残るため、手動操作や確認ポイントの記録に向いている
-- `OIDC_CLIENT_SECRET` などの秘密情報は `echo` せず、必要なら `read -s` で入力する
-- 生ログには秘密情報や一時的な値が含まれる可能性があるため、`scratch/logs/` は基本的にコミット対象にしない
-
-必要なら、個人のシェル設定で次のような alias を作り、`doclog` を短く呼び出すこともできる。
-
-```zsh
-alias dlog='zsh scripts/doclog.zsh'
-```
+詳しい使い方は [`scratch/logs/手順ログの残し方.md`](scratch/logs/手順ログの残し方.md) に切り出した。
+`doclog` の基本運用や注意点をまとめてあるので、必要なときはそちらを参照する。
 
 ## ディレクトリ構成
 
