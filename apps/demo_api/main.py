@@ -9,6 +9,7 @@ import httpx
 from authlib.jose import JsonWebKey, jwt
 from authlib.jose.errors import BadSignatureError, ExpiredTokenError, JoseError
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.responses import JSONResponse
 
 
 @dataclass(frozen=True)
@@ -62,7 +63,12 @@ def load_settings() -> Settings:
 
 settings = load_settings()
 
-app = FastAPI(title="FastAPI Backend API Demo")
+
+class UTF8JSONResponse(JSONResponse):
+    media_type = "application/json; charset=utf-8"
+
+
+app = FastAPI(title="FastAPI Backend API Demo", default_response_class=UTF8JSONResponse)
 app.state.jwks_cache = JwksCache(settings.jwks_cache_ttl_seconds)
 
 
