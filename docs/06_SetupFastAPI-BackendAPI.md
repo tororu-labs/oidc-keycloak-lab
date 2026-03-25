@@ -1,33 +1,17 @@
 # Setup FastAPI Backend API
 
-## 目的
+## ここでのゴール
 
-このドキュメントは、FastAPI ベースの最小 OIDC ログイン検証を次の段階へ進め、BFF と Backend API を分離して Access Token による API 保護を確認するためのハンズオンを記録するものである。  
-主な目的は以下の通り。
+この手順では、BFF と Backend API を分離し、Access Token を使った API 保護を確認する。  
+次の状態に到達することをゴールとする。
 
 - `apps/demo_bff/` を BFF として使い、session から Access Token を取り出して別 API へ渡せるようにする
 - `apps/demo_api/` を Backend API として追加し、Bearer token の署名、`iss`、`exp` を検証できるようにする
 - `alice` と `bob` で `/api/me`、`/api/admin-data` の結果を比較し、BFF 側の session 管理と API 側の認可判定の違いを確認する
 - 「ブラウザは Cookie を使い、API は JWT を検証する」という役割分担を体験する
 
-### 用語
-
-- Backend API: BFF の後段で動き、Bearer token を受け取って保護されたデータを返す API
-- Bearer token: `Authorization: Bearer <token>` の形式で送る access token
-- JWKS: JWT の署名検証に使う公開鍵セット
-- issuer (`iss`): token を発行した主体
-
-------
-
-## 実施概要
-
-今回のセットアップでは、以下の流れで作業を進める。
-
-1. 新しい Backend API アプリ `apps/demo_api/` の依存関係をインストールする
-2. BFF と Backend API の環境変数を設定する
-3. Backend API を `http://localhost:8001` で起動する
-4. BFF を `http://localhost:8000` で起動する
-5. `alice` と `bob` でログインし、BFF 経由で `/api/me` と `/api/admin-data` を確認する
+必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。  
+全体の役割分担は [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) に整理した。
 
 ------
 
@@ -41,7 +25,7 @@
 - Keycloak が `http://localhost:8080` で起動している
 - `demo-bff` client secret を使って BFF からログインできる
 
-### 前提確認の判定
+判定:
 
 - `http://localhost:8000` で BFF のトップページが開く
 - `alice` は `/me` に到達できる
@@ -49,46 +33,47 @@
 
 ------
 
-## アプリ構成
+## この手順の流れ
 
-今回の段階では、アプリ構成は以下になる。
+この手順では、以下の流れで進める。
 
-- `apps/demo_bff/main.py`
-  - OIDC ログイン開始
-  - callback で token 受信
-  - session 管理
-  - `/api/me`、`/api/admin-data` で Backend API を代理呼び出し
-- `apps/demo_api/main.py`
-  - `Authorization: Bearer <token>` を受け取る
-  - Keycloak の公開鍵で JWT を検証する
-  - role に応じてレスポンスを分ける
+1. 新しい Backend API アプリ `apps/demo_api/` の依存関係をインストールする
+2. BFF と Backend API の環境変数を設定する
+3. Backend API を `http://localhost:8001` で起動する
+4. BFF を `http://localhost:8000` で起動する
+5. `alice` と `bob` でログインし、BFF 経由で `/api/me` と `/api/admin-data` を確認する
+6. Backend API 停止時の挙動を確認する
 
-### アプリ構成の補足
+------
 
-- BFF はブラウザと session cookie ベースで通信する
-- Backend API は Cookie を見ず、access token だけを見る
-- 初回学習用として、Backend API では `aud` 検証はまだ行わない
+## この手順で使う画面とエンドポイント
+
+今回の手順では、BFF と Backend API の両方を使い、次の URL やエンドポイントを確認する。
+
+- `http://localhost:8000`
+- `http://localhost:8000/api/me`
+- `http://localhost:8000/api/admin-data`
+- `http://localhost:8001/`
+- `http://localhost:8001/me`
+- `http://localhost:8001/admin-data`
+
+補足:
+
+- BFF と Backend API の役割差は [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) を参照する
 
 ------
 
 ## 依存関係のインストール
 
 プロジェクトルートで仮想環境を有効化し、Backend API 用の依存関係を追加でインストールする。  
-新しいターミナルを開いた直後や、VSCode 上でインストール行だけを単独実行した場合は `python` がシステム環境を向くことがある。`python` がシステム環境を向いていると `externally-managed-environment` になるため、導入コマンドは `.venv` の Python を明示して実行する。
+新しいターミナルを開いた直後や、VSCode 上でインストール行だけを単独実行した場合は `python` がシステム環境を向くことがある。導入コマンドは `.venv` の Python を明示して実行する。
 
 ~~~zsh
 source .venv/bin/activate
 ./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt
 ~~~
 
-### 依存関係のインストールの補足
-
-- `fastapi`: Backend API 本体
-- `uvicorn`: 開発用サーバ
-- `httpx`: Keycloak の JWKS を取得するために使う
-- `authlib`: JWT の署名検証に使う
-
-### 依存関係のインストールの判定
+判定:
 
 - `./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt` が成功する
 - `./.venv/bin/python -m pip show fastapi authlib uvicorn httpx` で導入を確認できる
@@ -100,9 +85,9 @@ source .venv/bin/activate
 Backend API 側では Keycloak の公開鍵取得先を知るために、Keycloak の URL と realm を設定する。  
 BFF 側では既存の設定に加えて、呼び出し先 Backend API の URL を設定する。
 
-`export` した環境変数は、そのコマンドを実行したシェルにしか残らない。
-この手順では Backend API と BFF を別ターミナルで起動するため、必要な値をそれぞれのターミナルで設定する。
-必要に応じて `apps/demo_api/.env.example` と `apps/demo_bff/.env.example` を横に開いて確認すると分かりやすい。
+`export` した環境変数は、そのコマンドを実行したシェルにしか残らない。  
+この手順では Backend API と BFF を別ターミナルで起動するため、必要な値をそれぞれのターミナルで設定する。  
+起動パターンの整理や、各変数をどこで使うかは [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
 
 ~~~zsh
 # ターミナルA: Backend API 用
@@ -123,12 +108,11 @@ export BACKEND_API_BASE_URL=http://localhost:8001
 export SESSION_SECRET="$(./.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
 ~~~
 
-### 環境変数の設定の補足
+補足:
 
 - `BACKEND_API_BASE_URL` は BFF が proxy 先を決めるために使う
 - Backend API は `OIDC_CLIENT_SECRET` を使わない
 - `SESSION_SECRET` は BFF 側だけで利用する
-- 別ターミナルを新しく開いた場合は、そのターミナルでも必要な `export` をやり直す
 
 ------
 
@@ -144,7 +128,7 @@ uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 
 別ターミナルで `http://localhost:8001/` を開くと、保護対象ルートや検証内容を示す JSON が表示される。
 
-### Backend API 起動の判定
+判定:
 
 - `http://localhost:8001/` が開く
 - `/me` と `/admin-data` が protected route として表示される
@@ -162,10 +146,13 @@ source .venv/bin/activate
 uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 ~~~
 
-### BFF 起動の補足
+判定:
 
-- `docs/05_SetupFastAPI-OIDCLogin.md` と同じ `demo-bff` client をそのまま使う
-- `/api/me` と `/api/admin-data` は BFF の session を見てから Backend API を呼び出す
+- `http://localhost:8000` が開く
+- BFF が `demo-bff` client を使ってログイン開始できる
+
+補足:
+
 - BFF 用ターミナルでは `OIDC_CLIENT_SECRET` と `SESSION_SECRET` が設定済みであることを確認する
 - 確認後は両方の `uvicorn` を `Ctrl+C` で停止する
 
@@ -176,16 +163,21 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 ブラウザで `http://localhost:8000` を開き、Keycloak 経由でログインしたあとに BFF の `/api/*` を確認する。  
 このとき、ブラウザは session cookie を送り、BFF は session から access token を取り出して Backend API へ Bearer token として転送する。
 
+この段階では、`backend_status` に加えて `error_stage` も確認する。  
+正常系では `error_stage` は `null` になり、失敗時は原因に応じた値が入る。
+
 ### `alice` で確認すること
 
 1. `http://localhost:8000` を開く
 2. `Keycloak でログイン` を押して `alice` でログインする
 3. `http://localhost:8000/api/me` を開く
 4. `backend_status` が `200` であることを確認する
-5. `backend_response.user.preferred_username` が `alice` であることを確認する
-6. `backend_response.user.roles` に `viewer` が含まれることを確認する
-7. `http://localhost:8000/api/admin-data` を開く
-8. `backend_status` が `403` であることを確認する
+5. `error_stage` が `null` であることを確認する
+6. `backend_response.user.preferred_username` が `alice` であることを確認する
+7. `backend_response.user.roles` に `viewer` が含まれることを確認する
+8. `http://localhost:8000/api/admin-data` を開く
+9. `backend_status` が `403` であることを確認する
+10. `error_stage` が `backend_authorization` であることを確認する
 
 ### `bob` で確認すること
 
@@ -194,67 +186,51 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 3. 再度 `Keycloak でログイン` を押して `bob` でログインする
 4. `http://localhost:8000/api/me` を開く
 5. `backend_status` が `200` であることを確認する
-6. `backend_response.user.preferred_username` が `bob` であることを確認する
-7. `backend_response.user.roles` に `admin` が含まれることを確認する
-8. `http://localhost:8000/api/admin-data` を開く
-9. `backend_status` が `200` であることを確認する
+6. `error_stage` が `null` であることを確認する
+7. `backend_response.user.preferred_username` が `bob` であることを確認する
+8. `backend_response.user.roles` に `admin` が含まれることを確認する
+9. `http://localhost:8000/api/admin-data` を開く
+10. `backend_status` が `200` であることを確認する
+11. `error_stage` が `null` であることを確認する
 
-### API アクセスフロー確認の補足
+判定:
+
+- `alice` は `/api/me` 成功かつ `/api/admin-data` が `403` になる
+- `bob` は `/api/me` 成功かつ `/api/admin-data` 成功になる
+- BFF のレスポンスに `backend_status`、`error_stage`、`backend_response` が含まれる
+
+補足:
 
 - `/api/me` は BFF 自体の `/me` とは異なり、Backend API が JWT を検証した結果を返す
 - `/api/admin-data` は Backend API 側で `admin` role を要求する
 - BFF は access token を転送するだけで、JWT の署名検証は Backend API 側で行う
-- `/api/*` のレスポンスは JSON なので、ユーザー切り替え時はいったんトップページへ戻って `ログアウト` を押す
-
-### API アクセスフロー確認の判定
-
-- `alice` は `/api/me` 成功かつ `/api/admin-data` が `403` になる
-- `bob` は `/api/me` 成功かつ `/api/admin-data` 成功になる
-- BFF のレスポンスに `backend_status` と `backend_response` が含まれる
+- 失敗時の `error_stage` の意味一覧は [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) を参照する
+- `/api/*` の確認後にユーザーを切り替えるときは、いったんトップページへ戻って `ログアウト` を押す
 
 ------
 
-## ログで見るポイント
+## 実行コマンド一覧
 
-この段階では、BFF と Backend API の両方のログを見ると役割の違いが分かりやすい。
+### Backend API 依存関係
 
-- BFF の `uvicorn` ログ
-  - `/login`
-  - `/auth/callback`
-  - `/api/me`
-  - `/api/admin-data`
-- Backend API の `uvicorn` ログ
-  - `/me`
-  - `/admin-data`
-  - `alice` の `/admin-data` では `403`
-  - `bob` の `/admin-data` では `200`
+~~~zsh
+source .venv/bin/activate
+./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt
+~~~
 
-### ログ確認の補足
+### 起動コマンド
 
-- BFF 側では session が有効であることを前提に proxy が行われる
-- Backend API 側では Cookie を見ず、Bearer token だけで認可する
-- ここが「session は BFF、JWT 検証は API」という役割分担の核心になる
+~~~zsh
+# Backend API
+uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 
-------
+# BFF
+uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
+~~~
 
-## Backend API 停止時の確認
-
-Backend API を停止した状態で `http://localhost:8000/api/me` または `http://localhost:8000/api/admin-data` を開くと、BFF 側で `502` を返すことがある。  
-この場合は、BFF が session を持っていても downstream API へ到達できないため、代理呼び出しに失敗している。
-
-### Backend API 停止時の確認の判定
-
-- BFF 側のレスポンスで `detail` に接続失敗が表示される
-- `backend_url` に `http://localhost:8001/...` が含まれる
+共通の起動・停止・確認観点は [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
 
 ------
-
-## 本ドキュメントで完了したこと
-
-- BFF と Backend API を FastAPI 同士で分離した
-- BFF が session から access token を取り出して別 API に渡せるようになった
-- Backend API が JWT の署名、`iss`、`exp` を検証する最小構成を確認できた
-- `alice` と `bob` で API レベルの認可結果が分かれることを確認できた
 
 ## 完了判定
 
@@ -263,3 +239,30 @@ Backend API を停止した状態で `http://localhost:8000/api/me` または `h
 - `alice` は `/api/admin-data` で `403` になる
 - `bob` は `/api/admin-data` に到達できる
 - BFF と Backend API の役割分担を、自分の言葉で説明できる
+
+------
+
+## まとめ
+
+今回の手順で確認したこと:
+
+- BFF と Backend API を FastAPI 同士で分離した
+- BFF が session から access token を取り出して別 API に渡せることを確認した
+- Backend API が Access Token を検証して API 保護を行う最小構成を確認した
+- `alice` と `bob` で API レベルの認可結果が分かれることを確認した
+
+ここまでで、BFF と Backend API を分離した最小構成で API 保護を確認できた。  
+次は [07_SetupTokenValidationAndFailureCases.md](./07_SetupTokenValidationAndFailureCases.md) を参照し、token 検証観点と代表的な失敗例を確認する。
+
+------
+
+## 関連ドキュメント
+
+- [05_SetupFastAPI-OIDCLogin.md](./05_SetupFastAPI-OIDCLogin.md) を参照
+- [07_SetupTokenValidationAndFailureCases.md](./07_SetupTokenValidationAndFailureCases.md) を参照
+- [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照
+- [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) を参照
+- [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照
+- [04_ClientAndTokenRoles.md](./Reference/04_ClientAndTokenRoles.md) を参照
+- [main.py](../apps/demo_bff/main.py) を参照
+- [main.py](../apps/demo_api/main.py) を参照
