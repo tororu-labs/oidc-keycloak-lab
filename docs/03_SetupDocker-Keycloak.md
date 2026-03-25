@@ -1,30 +1,21 @@
 # Setup Docker Keycloak
 
-## 目的
+## ここでのゴール
 
-このドキュメントは、IAM Study Lab の環境構築の一環として、Docker を使って Keycloak と PostgreSQL を起動するまでの手順を記録するものである。  
-主な目的は以下の通り。
+この手順では、Docker を使って Keycloak と PostgreSQL を起動し、次の状態に到達することをゴールとする。
 
-- Docker Desktop をインストールして Docker 環境を整える
-- `infra/keycloak/.env` を作成して Keycloak と PostgreSQL の環境変数を定義する
-- `infra/keycloak/docker-compose.yml` を作成してコンテナ構成を定義する
-- Docker Compose で Keycloak と PostgreSQL のコンテナを起動する
-- Keycloak の管理コンソールへアクセスできる状態にする
+- Docker Desktop を使える状態にする
+- `infra/keycloak/.env` と `docker-compose.yml` を用意する
+- Docker Compose で Keycloak と PostgreSQL を起動する
+- Keycloak の管理コンソールへアクセスできる
 
-### 用語
-
-- Docker Desktop: Docker Engine や Docker Compose をローカルで利用するためのアプリケーション
-- Docker Compose: 複数コンテナの構成を YAML ファイルで定義し、まとめて起動・停止できる仕組み
-- container: アプリケーションを分離された実行環境で動かす単位
-- service: Compose 上で定義するコンテナ設定の単位
-- volume: コンテナを削除しても保持したいデータを保存する領域
-- healthcheck: コンテナが正常に動作しているかを確認するための設定
+必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
 
 ------
 
-## 実施概要
+## この手順の流れ
 
-今回のセットアップでは、以下の流れで作業を進めた。
+この手順では、以下の流れで進める。
 
 1. Docker Desktop をインストールして起動確認
 2. `infra/keycloak/.env` を作成
@@ -51,9 +42,10 @@ docker compose version
 docker run hello-world
 ~~~
 
-### Docker Desktop の利用確認の判定
+判定:
 
-`docker version` と `docker compose version` が表示され、`docker run hello-world` が成功したため、Docker 環境は正常に利用できると判断した。
+- `docker version` と `docker compose version` が表示される
+- `docker run hello-world` が成功する
 
 ------
 
@@ -72,11 +64,17 @@ KC_BOOTSTRAP_ADMIN_PASSWORD=******
 EOF
 ~~~
 
-この `.env` ファイルには秘密情報が含まれるため、本番環境では環境変数やシークレット管理ツールを使う想定である。今回は学習目的のため、ローカル開発用の簡易構成として扱った。
+判定:
 
-### `.env` の作成完了時の状態
+- `infra/keycloak/.env` を作成し、必要な環境変数を書ける
+
+完了時の状態:
 
 Keycloak と PostgreSQL が参照するデータベース名、接続ユーザー、初期管理者ユーザーの情報をローカルファイルで管理できる状態になった。
+
+補足:
+
+- `.env` には秘密情報が含まれるため、本番環境では環境変数やシークレット管理ツールを使う想定とする
 
 ------
 
@@ -127,16 +125,20 @@ volumes:
 EOF
 ~~~
 
-### `docker-compose.yml` の作成の補足
+判定:
+
+- `docker compose` で Keycloak と PostgreSQL をまとめて起動できる設定ファイルを用意できる
+
+完了時の状態:
+
+`docker compose` で Keycloak と PostgreSQL をまとめて起動できる設定ファイルが用意できる。
+
+補足:
 
 - `postgres` サービスは `pgdata` volume を利用し、データベースの内容を永続化する構成にした。
 - `keycloak` サービスは `depends_on` と PostgreSQL 側の `healthcheck` を利用し、DB の起動確認後に接続する構成にした。
 - `127.0.0.1:8080:8080` を指定することで、Keycloak の管理画面をローカル PC からのみ参照できるようにした。
 - `name: iam-lab-study-keycloak` を明示し、このプロジェクトで作られる container・network・volume の名前を判別しやすくした。
-
-### 実施時の状態
-
-`docker compose` コマンドで Keycloak と PostgreSQL をまとめて起動できる設定ファイルが用意できた。
 
 ------
 
@@ -165,9 +167,13 @@ docker compose ps
 `up / down / down -v` の違いは `notes/02_Docker/01_ComposeLifecycle.md`、
 デバッグ時の確認観点は `notes/02_Docker/02_DebugChecklist.md` に整理した。
 
-### コンテナ起動の判定
+判定:
 
 `docker compose ps` で PostgreSQL コンテナが `healthy` となり、Keycloak コンテナが起動状態になっていれば、Compose による起動は成功と判断した。
+
+補足:
+
+- 起動方法や切り分けの共通整理は [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) と [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) を参照する
 
 ------
 
@@ -175,25 +181,11 @@ docker compose ps
 
 ブラウザで `http://localhost:8080` にアクセスし、Keycloak の管理コンソールが表示されることを確認した。
 
-### 管理コンソールの判定
+判定:
 
 - Keycloak の管理コンソールが表示される
 - `.env` に設定した初期管理者ユーザーでログインできる
 - Keycloak をローカル環境から操作できる状態になっている
-
-------
-
-## 本ドキュメントで完了したこと
-
-以下が完了した状態になった。
-
-- Docker Desktop のインストール
-- Keycloak 用 `.env` の作成
-- `docker-compose.yml` の作成
-- PostgreSQL と Keycloak の起動
-- Keycloak 管理コンソールの表示確認
-
-つまり、ローカル環境で Keycloak を使った IAM 検証を始めるための土台ができた。
 
 ------
 
@@ -234,5 +226,20 @@ docker compose -f infra/keycloak/docker-compose.yml ps # 起動状態確認
 
 ## まとめ
 
-今回のセットアップで、Docker を使って Keycloak と PostgreSQL をローカル環境に起動する流れを整理できた。  
-今後はこの環境を利用して、Realm、Client、User の作成や認可設定の検証を進めていく予定である。
+今回の手順で確認したこと:
+
+- Docker Desktop を使える状態にした
+- Keycloak 用 `.env` と `docker-compose.yml` を作成した
+- PostgreSQL と Keycloak を起動した
+- 管理コンソールへアクセスできることを確認した
+
+ここまでで、ローカル環境で Keycloak を使った IAM 検証を始める土台を用意できた。  
+次は [04_SetupKeycloak.md](/Users/tororu/workspace/labs/iam-lab-study/docs/04_SetupKeycloak.md) を参照し、realm、user、role、client を設定する。
+
+------
+
+## 関連ドキュメント
+
+- [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照
+- [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照
+- [04_SetupKeycloak.md](./04_SetupKeycloak.md) を参照

@@ -1,28 +1,20 @@
 # Setup Python Virtual Environment (venv)
 
-## 目的
+## ここでのゴール
 
-このドキュメントは、IAM Study Lab の Python 開発環境を整えるために、`venv` を使った仮想環境の作成手順を記録するものである。  
-主な目的は以下の通り。
+この手順では、Python の仮想環境を作成し、次の状態に到達することをゴールとする。
 
-- プロジェクトごとに独立した Python 仮想環境を作成する
-- 依存関係の衝突を避けられるようにする
-- VSCode で `.venv` を利用する設定を整える
-- 今後の Python アプリ開発に再利用できる初期導入手順を残す
+- プロジェクト専用の `.venv` を作成する
+- 仮想環境を有効化できる
+- VSCode で `.venv` を使う設定を整える
 
-### 用語
-
-- venv: Python 標準機能として提供されている仮想環境作成の仕組み
-- 仮想環境: プロジェクトごとに独立した Python とパッケージ群を持つ実行環境
-- activate: シェルが仮想環境内の Python を優先して使う状態に切り替えること
-- interpreter: 実際に Python コードを実行する Python 本体
-- `settings.json`: VSCode のワークスペース設定を記述するファイル
+必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
 
 ------
 
-## 実施概要
+## この手順の流れ
 
-今回のセットアップでは、以下の流れで作業を進めた。
+この手順では、以下の流れで進める。
 
 1. `python3 --version` で Python が利用可能か確認
 2. `python3 -m venv .venv` で仮想環境を作成
@@ -42,9 +34,9 @@ python3 --version
 
 実施時点では、`Python 3.12.12` が表示された。
 
-### Python の確認の判定
+判定:
 
-`python3 --version` が成功し、Python 3 のバージョンが表示されたため、`venv` を使った仮想環境作成を進められると判断した。
+- `python3 --version` が成功し、Python 3 のバージョンが表示される
 
 ------
 
@@ -57,9 +49,13 @@ cd ~/workspace/labs/iam-lab-study
 python3 -m venv .venv
 ~~~
 
-### 仮想環境の作成完了時の状態
+判定:
 
-プロジェクト直下に `.venv` ディレクトリが作成され、IAM Study Lab 専用の Python 実行環境が用意された。
+- プロジェクト直下に `.venv` ディレクトリを作成できる
+
+完了時の状態:
+
+プロジェクト専用の Python 実行環境が用意される。
 
 ------
 
@@ -76,10 +72,14 @@ which python
 
 仮想環境の有効化はターミナルごとに独立している。新しいターミナルを開いた場合や、VSCode 上でコマンドを 1 行だけ単独実行した場合は、実行前に再度 `which python` を確認する。
 
-### 仮想環境有効化の判定
+判定:
 
 - プロンプトに `(.venv)` が表示される
 - `which python` が `.venv/bin/python` を指している
+
+補足:
+
+- 新しいターミナルを開いた場合や VSCode 上で単独実行した場合は、実行前に再度 `which python` を確認する
 
 ------
 
@@ -92,9 +92,9 @@ VSCode を開き、プロジェクトの仮想環境を利用するようにイ�
 - `Python: Select Interpreter` を選択する
 - `iam-lab-study/.venv/bin/python` を選択する
 
-### インタープリター設定実施時の状態
+判定:
 
-VSCode 上で Python コードを実行するときに、プロジェクト専用の `.venv` が利用される状態になった。
+- VSCode で `iam-lab-study/.venv/bin/python` を選択できる
 
 ------
 
@@ -113,29 +113,15 @@ cat > .vscode/settings.json <<'EOF'
 EOF
 ~~~
 
-### `settings.json` の作成の補足
+判定:
+
+- `.vscode/settings.json` を作成し、`.venv` を参照する設定を書ける
+
+補足:
 
 - `python.defaultInterpreterPath` は、VSCode が既定で使う Python を `.venv` に固定するための設定である。
 - `python.terminal.activateEnvironment` は、VSCode 内のターミナル起動時に仮想環境を有効化しやすくするための設定である。
-- ただし、この設定があってもすべての実行方法で `.venv` が必ず使われるわけではない。パッケージ導入時は `which python` を確認するか、`./.venv/bin/python -m pip ...` のように `.venv` の Python を明示すると確実である。
-
-### `settings.json` の作成後の状態
-
-VSCode を開いたときに、ワークスペース単位で `.venv` を優先利用しやすい設定がそろった。
-
-------
-
-## 本ドキュメントで完了したこと
-
-以下が完了した状態になった。
-
-- Python 3 の利用確認
-- `.venv` の作成
-- 仮想環境の有効化確認
-- VSCode のインタープリター設定
-- ワークスペース設定ファイルの作成
-
-つまり、IAM Study Lab で Python アプリを作り始めるための基本的な実行環境が整った。
+- すべての実行方法で `.venv` が必ず使われるわけではない。パッケージ導入時は `which python` を確認するか、`./.venv/bin/python -m pip ...` のように `.venv` の Python を明示すると確実である。
 
 ------
 
@@ -175,5 +161,17 @@ mkdir -p .vscode # VSCode 設定ディレクトリの作成
 
 ## まとめ
 
-今回のセットアップで、IAM Study Lab の Python 開発で利用する仮想環境を作成し、VSCode から利用するための基本設定まで整理できた。  
-今後はこの `.venv` を使って必要なパッケージを追加し、FastAPI などの検証アプリを進めていく予定である。
+今回の手順で確認したこと:
+
+- Python 3 が利用できることを確認した
+- `.venv` を作成し、有効化できることを確認した
+- VSCode で `.venv` を使う設定を整えた
+
+ここまでで、IAM Study Lab の Python 実行環境を用意できた。  
+次は [03_SetupDocker-Keycloak.md](/Users/tororu/workspace/labs/iam-lab-study/docs/03_SetupDocker-Keycloak.md) を参照し、Keycloak のローカル起動環境を整える。
+
+------
+
+## 関連ドキュメント
+
+- [03_SetupDocker-Keycloak.md](./03_SetupDocker-Keycloak.md) を参照

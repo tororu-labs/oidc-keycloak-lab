@@ -1,30 +1,21 @@
 # Setup GitHub Repository
 
-## 目的
+## ここでのゴール
 
-このドキュメントは、IAM Study Lab を始めるにあたって実施した Git / GitHub の初期導入手順を記録するものである。  
-主な目的は以下の通り。
+この手順では、Git / GitHub の初期導入を行い、次の状態に到達することをゴールとする。
 
 - GitHub 上に IAM ラボ用のリポジトリを作成する
 - ローカル Mac から GitHub へ SSH 接続できるようにする
 - ローカルにリポジトリを clone し、初期ディレクトリ構成を作成する
-- 初回 commit / push までの流れを残す
+- 初回 commit / push まで完了する
 
-### 用語
-
-- commit:変更内容をローカルリポジトリに保存すること
-- push:ローカルリポジトリの変更をGitHubなどのリモートリポジトリに反映させること
-- リモートリポジトリ:GitHubなどのオンライン上に存在するリポジトリのこと
-- ローカルリポジトリ:開発者のPCなどのローカル環境に存在するリポジトリのこと
-- clone: GitHub 上のリポジトリをローカルにコピーすること
-- Ed25519形式: SSH 鍵の形式の一つで、セキュリティが高く推奨されている
-- ステージング: commit する前に変更内容を一時的に保存すること。`git add` コマンドで行う
+必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
 
 ------
 
-## 実施概要
+## この手順の流れ
 
-今回のセットアップでは、以下の流れで作業を進めた。
+この手順では、以下の流れで進める。
 
 1. GitHub 上で IAM ラボ用リポジトリを作成
 2. GitHub 用の SSH 鍵を作成
@@ -38,26 +29,20 @@
 
 ## GitHub リポジトリ作成（GitHubのWeb側で作業）
 
-### 作成したリポジトリ
-
 - Repository name: `iam-lab-study`
 - Visibility: `Private`
-
-### 初期設定
-
 - README: 作成
 - `.gitignore`: 作成
 - License: 追加しない
 
-### GitHub リポジトリ作成時の状態
+判定:
 
-GitHub 上に空のリポジトリができ、`README.md` と `.gitignore` を含む初回コミットが存在する状態になった。
+- GitHub 上にリポジトリが作成されている
+- `README.md` と `.gitignore` を含む初回コミットが存在している
 
 ------
 
 ## SSH 接続設定
-
-### 背景
 
 GitHub へローカル環境から安全に push / pull するため、HTTPS ではなく SSH 接続を利用することにした。  
 SSH 接続では、ローカルに秘密鍵を保持し、GitHub に公開鍵を登録することで認証を行う。
@@ -73,6 +58,10 @@ ls -al ~/.ssh
 ~~~
 
 この時点では、SSH 鍵は存在しない状態だったため、新たに作成することにした。
+
+判定:
+
+- 既存鍵の有無を確認できる
 
 ------
 
@@ -90,6 +79,10 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 - パスフレーズ: 設定（セキュリティ向上のため）
 - 確認のため再入力
 
+判定:
+
+- `~/.ssh/` に GitHub 用の鍵を作成できる
+
 ------
 
 ## ssh-agent の起動と鍵の追加
@@ -101,7 +94,9 @@ eval "$(ssh-agent -s)"
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 ~~~
 
-- 補足:macOS 以外の環境では、以下のコマンドで鍵を追加することもある。
+補足:
+
+- macOS 以外の環境では、以下のコマンドで鍵を追加することもある
 
 ~~~bash
 ssh-add ~/.ssh/id_ed25519
@@ -122,6 +117,10 @@ pbcopy < ~/.ssh/id_ed25519.pub
 ~~~zsh
 cat ~/.ssh/id_ed25519.pub
 ~~~
+
+判定:
+
+- 公開鍵を GitHub へ登録できる状態になっている
 
 ------
 
@@ -159,29 +158,23 @@ ssh -T git@github.com
 Hi tororu-labs! You've successfully authenticated, but GitHub does not provide shell access.
 ~~~
 
-### SSH 接続確認の判定
+判定:
 
-このメッセージが表示されたため、SSH 認証は正常に完了していると判断した。
+- 上記メッセージが表示され、SSH 認証が完了している
 
 ------
 
 ## ローカルへのリポジトリ clone
-
-### 作業用ディレクトリ作成
 
 ~~~zsh
 mkdir -p ~/projects
 cd ~/projects
 ~~~
 
-### clone 実行
-
 ~~~zsh
 git clone git@github.com:tororu-labs/iam-lab-study.git
 cd iam-lab-study
 ~~~
-
-### 確認
 
 ~~~zsh
 pwd
@@ -190,9 +183,11 @@ git branch
 ls -la
 ~~~
 
-ここでは、現在の作業ディレクトリ、リモート接続先、ブランチも合わせて確認した。
+判定:
 
-この時点で、GitHub リポジトリと接続されたローカル作業ディレクトリができた。
+- ローカルにリポジトリを clone できる
+- `git remote -v` で GitHub への接続先を確認できる
+- 作業ディレクトリが用意できる
 
 ------
 
@@ -205,9 +200,9 @@ mkdir -p docs notes apps infra scratch
 touch docs/.gitkeep notes/.gitkeep apps/.gitkeep infra/.gitkeep scratch/.gitkeep
 ~~~
 
-- 補足: `.gitkeep` ファイルは、Git が空のディレクトリを管理できないため、空のフォルダを残すために置いている。
+補足:
 
-### 作成した構成
+- `.gitkeep` は、Git が空のディレクトリを管理できないため、空のフォルダを残すために置いている
 
 ~~~text
 iam-lab-study/
@@ -220,10 +215,14 @@ iam-lab-study/
 └── scratch/
 ~~~
 
-### 各ディレクトリの用途
+判定:
+
+- 必要な初期ディレクトリを作成できる
+
+補足:
 
 - `docs/`
-  - 設計資料、構成図、手順書、runbook
+  - Setup と Reference を置く
 - `notes/`
   - 学習メモ、理解メモ、調査メモ
 - `apps/`
@@ -245,11 +244,13 @@ git status
 この時点では、新しく作成したディレクトリ群が `Untracked files` として表示された。
 この確認のタイミングで、意図しないファイルが混ざっていないかも合わせて見た。
 
+判定:
+
+- 意図したファイルだけが追加対象になっていることを確認できる
+
 ------
 
 ## 初回 commit / push
-
-### add
 
 ~~~zsh
 git add .
@@ -257,37 +258,19 @@ git add .
 
 今回は `git add .` を使ったが、実行前に `git status` で対象を確認してから進めた。
 
-### commit
-
 ~~~zsh
 git commit -m "chore: initialize local IAM lab structure"
 ~~~
-
-### push
 
 ~~~zsh
 git push origin main
 ~~~
 
-### 実行結果の意味
+判定:
 
 - ローカルに初期構成を commit した
 - GitHub 上の `main` ブランチへ push した
 - GitHub とローカルの同期が取れた
-
-------
-
-## 本ドキュメントで完了したこと
-
-以下が完了した状態になった。
-
-- GitHub リポジトリ作成
-- SSH 接続設定
-- ローカル clone
-- 初期ディレクトリ構成作成
-- 初回 commit / push
-
-つまり、IAM Study Lab の開発・学習を始めるための土台ができた。
 
 ------
 
@@ -336,5 +319,18 @@ git push origin main #変更をリモートに push
 
 ## まとめ
 
-今回のセットアップで、IAM Study Lab の開発を始めるための Git / GitHub 環境が整った。
-今後はこの環境を活用して、学習内容の記録やコードの管理を行っていく予定である。
+今回の手順で確認したこと:
+
+- GitHub リポジトリを作成した
+- SSH 接続を設定した
+- ローカルへ clone し、初期ディレクトリ構成を作成した
+- 初回 commit / push を完了した
+
+ここまでで、IAM Study Lab の開発と学習を始めるための Git / GitHub 環境を用意できた。  
+次は [02_SetupVenv.md](/Users/tororu/workspace/labs/iam-lab-study/docs/02_SetupVenv.md) を参照し、Python の実行環境を整える。
+
+------
+
+## 関連ドキュメント
+
+- [02_SetupVenv.md](./02_SetupVenv.md) を参照
