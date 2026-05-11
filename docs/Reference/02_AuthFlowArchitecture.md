@@ -64,6 +64,8 @@ Backend API
 
 この切り分けを持っておくと、`redirect_uri` 不一致はフロントチャネル、`client secret` 不一致はバックチャネル寄りの失敗だと見分けやすい。
 
+![認可コードフロー詳細](../image/doc05_Authorization-Code-Flow-in-Detail.drawio.svg)
+
 ------
 
 ## Session と Access Token の役割分担
@@ -83,6 +85,8 @@ Backend API
   - BFF が access token を Backend API に渡し、Backend API が JWT を検証して返す
 
 見た目は似ていても、`/me` は BFF 側の状態確認、`/api/me` は API 側の token 検証結果という違いがある。
+
+![セッションベース API コールフロー](../image/doc06_Session-Based-API-Call-Flow.drawio.svg)
 
 ------
 
@@ -141,4 +145,3 @@ Backend API
 
 - [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md)
 - [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md)
-- [Architecture.md](/Users/tororu/workspace/labs/iam-lab-study/infra/Architecture.md)
