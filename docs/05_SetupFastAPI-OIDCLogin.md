@@ -9,8 +9,8 @@
 - session を使ってログイン状態を保持し、`/me` と `/admin` で認証・認可結果を確認できるようにする
 - `alice` と `bob` の role 差分がアプリ側の挙動にどう反映されるかを確認する
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。  
-この段階で扱う BFF、session、token の役割分担は [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) に整理した。
+必要な用語は [00_Glossary.md](./Reference/00_Glossary.md) を参照する。  
+この段階で扱う BFF、session、token の役割分担は [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) に整理した。
 
 ------
 
@@ -90,7 +90,7 @@ Web origins: http://localhost:8000
 ## この手順で使う画面とエンドポイント
 
 今回追加したアプリは `apps/demo_bff/` に置いてある。  
-この手順では、`/login`、`/auth/callback`、`/me`、`/admin`、`/logout` を使って OIDC ログインと role 差分を確認する。BFF の役割分担は、必要に応じて [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) を参照する。
+この手順では、`/login`、`/auth/callback`、`/me`、`/admin`、`/logout` を使って OIDC ログインと role 差分を確認する。BFF の役割分担は、必要に応じて [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) を参照する。
 
 ------
 
@@ -115,7 +115,7 @@ source .venv/bin/activate
 
 `.env.example` を参考に、実行用の環境変数を設定する。  
 ここでは BFF 単体確認に必要な最小構成だけを記載する。  
-起動時に使う環境変数の意味や、BFF 単体と BFF + Backend API の使い分けは [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
+起動時に使う環境変数の意味や、BFF 単体と BFF + Backend API の使い分けは [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照する。
 
 ~~~zsh
 source .venv/bin/activate
@@ -229,7 +229,7 @@ export APP_BASE_URL=http://localhost:8000
 export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
 ~~~
 
-共通の起動・停止・確認観点は [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
+共通の起動・停止・確認観点は [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照する。
 
 ------
 
@@ -257,7 +257,7 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 - logout を確認した
 
 ここまでで、Keycloak の GUI で作成した設定を実際の Web アプリへ接続し、OIDC ログインと role ベース認可の最小構成を確認できた。  
-次は [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md) を参照し、BFF と Backend API を分離して JWT 検証付き API 保護を確認する。
+次は [06_SetupFastAPI-BackendAPI.md](./06_SetupFastAPI-BackendAPI.md) を参照し、BFF と Backend API を分離して JWT 検証付き API 保護を確認する。
 
 ------
 

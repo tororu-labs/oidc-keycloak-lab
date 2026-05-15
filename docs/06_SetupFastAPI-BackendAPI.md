@@ -10,8 +10,8 @@
 - `alice` と `bob` で `/api/me`、`/api/admin-data` の結果を比較し、BFF 側の session 管理と API 側の認可判定の違いを確認する
 - 「ブラウザは Cookie を使い、API は JWT を検証する」という役割分担を体験する
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。  
-全体の役割分担は [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) に整理した。
+必要な用語は [00_Glossary.md](./Reference/00_Glossary.md) を参照する。  
+全体の役割分担は [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) に整理した。
 
 ------
 
@@ -42,7 +42,8 @@
 3. Backend API を `http://localhost:8001` で起動する
 4. BFF を `http://localhost:8000` で起動する
 5. `alice` と `bob` でログインし、BFF 経由で `/api/me` と `/api/admin-data` を確認する
-6. Backend API 停止時の挙動を確認する
+
+この手順では上記の 5 ステップを扱う。「Backend API 停止時の挙動」は [07_SetupTokenValidationAndFailureCases.md](./07_SetupTokenValidationAndFailureCases.md) で確認する。
 
 ------
 
@@ -59,7 +60,7 @@
 
 補足:
 
-- BFF と Backend API の役割差は [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md) を参照する
+- BFF と Backend API の役割差は [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) を参照する
 
 ------
 
@@ -87,7 +88,7 @@ BFF 側では既存の設定に加えて、呼び出し先 Backend API の URL �
 
 `export` した環境変数は、そのコマンドを実行したシェルにしか残らない。  
 この手順では Backend API と BFF を別ターミナルで起動するため、必要な値をそれぞれのターミナルで設定する。  
-起動パターンの整理や、各変数をどこで使うかは [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
+起動パターンの整理や、各変数をどこで使うかは [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照する。
 
 ~~~zsh
 # ターミナルA: Backend API 用
@@ -143,7 +144,7 @@ Backend API と BFF は別ターミナルで同時に起動し、どちらの `u
 ~~~zsh
 # 上の「ターミナルB」で実行する
 source .venv/bin/activate
-uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
+uvicorn main:app --app-dir apps/demo_bff --reload
 ~~~
 
 判定:
@@ -204,7 +205,7 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 - `/api/me` は BFF 自体の `/me` とは異なり、Backend API が JWT を検証した結果を返す
 - `/api/admin-data` は Backend API 側で `admin` role を要求する
 - BFF は access token を転送するだけで、JWT の署名検証は Backend API 側で行う
-- 失敗時の `error_stage` の意味一覧は [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) を参照する
+- 失敗時の `error_stage` の意味一覧は [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照する
 - `/api/*` の確認後にユーザーを切り替えるときは、いったんトップページへ戻って `ログアウト` を押す
 
 ------
@@ -225,10 +226,10 @@ source .venv/bin/activate
 uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 
 # BFF
-uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
+uvicorn main:app --app-dir apps/demo_bff --reload
 ~~~
 
-共通の起動・停止・確認観点は [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md) を参照する。
+共通の起動・停止・確認観点は [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照する。
 
 ------
 
