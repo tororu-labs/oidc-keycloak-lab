@@ -8,8 +8,8 @@
 - `redirect_uri`、`client secret`、Backend API 停止などの失敗例を再現できる
 - `backend_status`、`error_stage`、`uvicorn` ログを使って、どこで失敗したかを切り分けられる
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。  
-横断的な切り分け観点や `error_stage` 一覧は [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) に整理した。
+必要な用語は [00_Glossary.md](./Reference/00_Glossary.md) を参照する。  
+横断的な切り分け観点や `error_stage` 一覧は [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) に整理した。
 
 ------
 
@@ -56,8 +56,8 @@
 
 補足:
 
-- 今回の手順では、まず `redirect_uri`、`client secret`、downstream 到達性を中心に確認する
-- `aud`、`iss`、`exp` の異常系は、この文書を起点に後で追加しやすいようにしている
+- この手順で実際に確認するのは `redirect_uri`、`client secret`、downstream 到達性の 3 つである
+- `aud`、`iss`、`exp` の異常系は [08_SetupAudienceValidation.md](./08_SetupAudienceValidation.md) 以降で確認する
 
 ------
 
@@ -125,7 +125,7 @@ export APP_BASE_URL=http://127.0.0.1:8000
 
 - FastAPI 側の `OIDC_CLIENT_SECRET` を、Keycloak の `demo-bff` client secret と異なる値へ変更する
 
-例:
+例（失敗例 2 で変更した `APP_BASE_URL` を元の値に戻したうえで、`OIDC_CLIENT_SECRET` のみ変更する）:
 
 ~~~zsh
 export APP_BASE_URL=http://localhost:8000
@@ -187,7 +187,7 @@ Backend API に到達できないとき、BFF 側でどのように失敗が見�
 
 補足:
 
-- `error_stage` の意味一覧は [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) を参照する
+- `error_stage` の意味一覧は [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照する
 - 必要なら `?raw=1` を付けて raw JSON を直接確認できる
 
 ------
