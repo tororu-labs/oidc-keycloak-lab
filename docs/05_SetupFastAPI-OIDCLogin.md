@@ -14,18 +14,6 @@
 
 ------
 
-## この手順の流れ
-
-この手順では、以下の流れで進める。
-
-1. Keycloak で `demo-bff` client を作成する
-2. FastAPI アプリの依存関係をインストールする
-3. 環境変数を設定してアプリを起動する
-4. `/login` から Keycloak へログインし、`/me` と `/admin` を確認する
-5. `alice` と `bob` の role 差分、および logout 後の状態を確認する
-
-------
-
 ## 前提確認
 
 この手順を始める前に、Keycloak の GUI セットアップが完了していることを確認する。  
@@ -40,6 +28,18 @@
 
 - `http://localhost:8080` の管理コンソールへ入れる
 - `lab` realm の `Users` と `Realm roles` を確認できる
+
+------
+
+## この手順の流れ
+
+この手順では、以下の流れで進める。
+
+1. Keycloak で `demo-bff` client を作成する
+2. FastAPI アプリの依存関係をインストールする
+3. 環境変数を設定してアプリを起動する
+4. `/login` から Keycloak へログインし、`/me` と `/admin` を確認する
+5. `alice` と `bob` の role 差分、および logout 後の状態を確認する
 
 ------
 
@@ -234,8 +234,6 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 ------
 
 ## 完了判定
-
-以下を満たしたため、FastAPI を使った最小 OIDC ログイン検証は完了とする。
 
 - `demo-bff` confidential client が作成されている
 - `uvicorn main:app --app-dir apps/demo_bff --reload` でアプリが起動する
