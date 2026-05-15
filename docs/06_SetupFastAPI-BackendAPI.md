@@ -43,7 +43,7 @@
 4. BFF を `http://localhost:8000` で起動する
 5. `alice` と `bob` でログインし、BFF 経由で `/api/me` と `/api/admin-data` を確認する
 
-この手順では step 5 まで扱う。step 6「Backend API 停止時の挙動を確認する」は [07_SetupTokenValidationAndFailureCases.md](./07_SetupTokenValidationAndFailureCases.md) で確認する。
+この手順では上記の 5 ステップを扱う。「Backend API 停止時の挙動」は [07_SetupTokenValidationAndFailureCases.md](./07_SetupTokenValidationAndFailureCases.md) で確認する。
 
 ------
 
