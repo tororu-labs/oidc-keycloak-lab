@@ -108,17 +108,28 @@ def build_verify_access_token(settings: Settings, cache: JwksCache):
         authorization: str | None = Header(default=None),
     ) -> dict[str, Any]:
         token = parse_bearer_token(authorization)
-        claims_options = {"iss": {"essential": True, "value": settings.issuer}}
+        # 07: claims_options = {"iss": {"essential": True, "value": settings.issuer}}  # 08 で aud 追加により置き換え
+        claims_options = {  # 08: aud 検証を追加
+            "iss": {"essential": True, "value": settings.issuer},
+            "aud": {"essential": True, "value": settings.expected_audience},
+        }
 
         for attempt in range(2):
             key_set = await load_jwks(settings, cache, force_refresh=attempt == 1)
             try:
                 claims = jwt.decode(token, key_set, claims_options=claims_options)
                 claims.validate(leeway=settings.clock_skew_seconds)
-                logger.info(
-                    "stage=backend_authentication_success user=%s iss=%s roles=%s",
+                # 07: logger.info(
+                #     "stage=backend_authentication_success user=%s iss=%s roles=%s",
+                #     claims.get("preferred_username"),
+                #     claims.get("iss"),
+                #     extract_roles(dict(claims)),
+                # )  # 08 で aud をログに追加したため置き換え
+                logger.info(  # 08: aud をログに追加
+                    "stage=backend_authentication_success user=%s iss=%s aud=%s roles=%s",
                     claims.get("preferred_username"),
                     claims.get("iss"),
+                    claims.get("aud"),
                     extract_roles(dict(claims)),
                 )
                 return dict(claims)

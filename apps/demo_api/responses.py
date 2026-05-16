@@ -18,9 +18,11 @@ def build_index_response(settings: Settings) -> dict[str, Any]:
     return {
         "name": "demo-api",
         "issuer": settings.issuer,
+        "expected_audience": settings.expected_audience,  # 08: aud 検証のために追加
         "protected_routes": ["/me", "/admin-data"],
-        "verification": ["signature", "iss", "exp"],
-        "note": "この段階では audience 検証は行わない。",
+        # 07: "verification": ["signature", "iss", "exp"],  # 08 で aud 追加により置き換え
+        # 07: "note": "この段階では audience 検証は行わない。",  # 08 で aud 検証追加により不要
+        "verification": ["signature", "iss", "exp", "aud"],  # 08: aud を追加
     }
 
 
