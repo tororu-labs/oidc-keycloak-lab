@@ -57,7 +57,7 @@ docs/                                  docs/Reference/
 
 | Phase | 種別 | 対象ファイル | ステータス |
 |-------|------|-------------|----------|
-| Phase 00 | Reference 切り出し | `Reference/05_TokenClaimsAndValidation.md` | 🔲 未着手 |
+| Phase 00 | Reference 切り出し | `Reference/05_TokenClaimsAndValidation.md` | ✅ 完了 |
 | Phase 01 | ハンズオン + Reference | `09_SetupClientScopeAndMapper.md` + `Reference/06_ClientScopeAndMapperTypes.md` | 🔲 未着手 |
 | Phase 02 | ハンズオン | `10_SetupJWTEdgeCaseTests.md` | 🔲 未着手 |
 | Phase 03 | ハンズオン + Reference | `11_SetupSecurityAuditAgent.md` + `Reference/07_AuditAndObservability.md` | 🔲 未着手 |

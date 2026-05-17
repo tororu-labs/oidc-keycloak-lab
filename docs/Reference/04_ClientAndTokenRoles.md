@@ -72,9 +72,12 @@ Keycloak GUI では、次を比べると追いやすい。
 - 署名が正しいか
 - `iss` が期待した Keycloak realm か
 - `exp` が期限切れでないか
+- `aud` が自分のサービス宛てか（`docs/08` で追加）
 - role claim に必要な権限が含まれているか
 
 `docs/06` の Backend API は、主に access token を見て JWT 検証と role 判定を行う。
+
+各 claim の意味と検証順序の詳細は [05_TokenClaimsAndValidation.md](./05_TokenClaimsAndValidation.md) を参照する。
 
 ここで大事なのは、API が見ているのは BFF の session ではなく access token だという点である。
 

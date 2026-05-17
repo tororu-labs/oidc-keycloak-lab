@@ -398,3 +398,4 @@ unset EXPECTED_AUDIENCE
 - [06_SetupFastAPI-BackendAPI.md](./06_SetupFastAPI-BackendAPI.md) を参照
 - [04_ClientAndTokenRoles.md](./Reference/04_ClientAndTokenRoles.md) を参照
 - [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照
+- [05_TokenClaimsAndValidation.md](./Reference/05_TokenClaimsAndValidation.md) — claim 検証の座学整理
