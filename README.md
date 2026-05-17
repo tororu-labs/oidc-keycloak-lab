@@ -4,14 +4,15 @@ IAM、OIDC、OAuth 2.0、Keycloak、BFF / Backend API 構成を手を動かし�
 
 ## 現在の進捗
 
-- `docs/01` から `docs/06` までの最小ハンズオンを完了済み
+- `docs/01` から `docs/08` までの最小ハンズオンを完了済み
 - Keycloak の GUI 設定、FastAPI による OIDC ログイン、BFF / Backend API 分離まで確認済み
-- `docs/Reference/` を作成し、起動手順、構成整理、トラブルシューティングを切り出し始めている
-- audience 検証、token 異常系、Next.js 連携は未着手
+- token 検証・異常系（docs/07）と audience 検証（docs/08）まで実装済み
+- `docs/Reference/` を作成し、起動手順、構成整理、トラブルシューティングを切り出し済み
+- Next.js 連携は未着手
 
 ## 読み進め方
 
-- まず `docs/01` から `docs/06` を順に読む
+- まず `docs/01` から `docs/08` を順に読む
 - 詳しい背景や共通手順は `docs/Reference/` を参照する
 - 試行錯誤や途中整理は `notes/` に残し、再利用価値が高いものは後で `docs/Reference/` へ移す
 
@@ -28,12 +29,12 @@ IAM、OIDC、OAuth 2.0、Keycloak、BFF / Backend API 構成を手を動かし�
 
 - `docs/Reference/01_LocalStartup.md` から `04_ClientAndTokenRoles.md` の育成
 - `docs/05` と `docs/06` の軽量化と Reference への寄せ直し
-- audience 検証と token 異常系の追加
 - Next.js を使った SPA / BFF 構成への拡張
 
 ## 参照用ドキュメント
 
-- [01_LocalStartup.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/01_LocalStartup.md)
-- [02_AuthFlowArchitecture.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/02_AuthFlowArchitecture.md)
-- [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md)
-- [04_ClientAndTokenRoles.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/04_ClientAndTokenRoles.md)
+- [00_Glossary.md](docs/Reference/00_Glossary.md)
+- [01_LocalStartup.md](docs/Reference/01_LocalStartup.md)
+- [02_AuthFlowArchitecture.md](docs/Reference/02_AuthFlowArchitecture.md)
+- [03_Troubleshooting.md](docs/Reference/03_Troubleshooting.md)
+- [04_ClientAndTokenRoles.md](docs/Reference/04_ClientAndTokenRoles.md)
