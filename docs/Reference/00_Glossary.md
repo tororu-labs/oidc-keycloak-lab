@@ -90,6 +90,34 @@ Keycloak を利用するアプリケーション側の設定単位。今回の r
 
 token にどの claim を載せるか、どの scope を扱うかをまとめる設定単位。user や role そのものではなく、token の中身の出し方に近い。
 
+## dedicated scope
+
+特定の client 専用の client scope。Keycloak は client 作成時に `<client名>-dedicated` を自動生成する。
+
+## shared scope
+
+複数の client に割り当てられる再利用可能な client scope。変更が全割り当て client に波及するため、影響範囲の確認が必要。
+
+## default scope
+
+client に割り当てた時点で、scope パラメータを問わず自動付与される scope。
+
+## optional scope
+
+scope パラメータで明示要求したときだけ付与される scope。`scope=openid <scope名>` のように認可リクエストに含める必要がある。
+
+## mapper
+
+client scope に追加する設定単位。token にどの claim をどのように追加するかを定義する。Audience / User Property / Hardcoded Claim / Role Name Mapper などの種別がある。
+
+## Hardcoded Claim Mapper
+
+固定値を token の claim として埋め込む mapper。ユーザーに関わらず常に同じ値を出したい場合（環境識別子など）に使う。
+
+## Role Name Mapper
+
+token 上のロール名を別の名前に変換する mapper。Keycloak 内部のロール定義は変わらず、token に出てくる表現だけを変える。
+
 ## redirect_uri
 
 IdP がログイン後にブラウザを戻してよい先の URL。Keycloak では登録済み値と一致しないと認可開始を拒否する。
