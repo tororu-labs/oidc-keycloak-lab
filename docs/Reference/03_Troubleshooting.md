@@ -26,7 +26,7 @@
 
 この順で見れば、「Keycloak 設定の問題なのか」「BFF の設定不足なのか」「Backend API 側の問題なのか」を早く分けられる。
 
-![失敗ケースとトリアージポイント](../image/doc07_Failure-Casesand-Triage-Points.drawio.svg)
+![失敗ケースとトリアージポイント](../../image/doc07_Failure-Casesand-Triage-Points.drawio.svg)
 
 ------
 

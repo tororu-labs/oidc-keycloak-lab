@@ -64,7 +64,7 @@ Backend API
 
 この切り分けを持っておくと、`redirect_uri` 不一致はフロントチャネル、`client secret` 不一致はバックチャネル寄りの失敗だと見分けやすい。
 
-![認可コードフロー詳細](../image/doc05_Authorization-Code-Flow-in-Detail.drawio.svg)
+![認可コードフロー詳細](../../image/doc05_Authorization-Code-Flow-in-Detail.drawio.svg)
 
 ------
 
@@ -86,7 +86,7 @@ Backend API
 
 見た目は似ていても、`/me` は BFF 側の状態確認、`/api/me` は API 側の token 検証結果という違いがある。
 
-![セッションベース API コールフロー](../image/doc06_Session-Based-API-Call-Flow.drawio.svg)
+![セッションベース API コールフロー](../../image/doc06_Session-Based-API-Call-Flow.drawio.svg)
 
 ------
 
