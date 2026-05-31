@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from typing import Any
+
 from auth import build_require_admin_claims, build_verify_access_token
 from config import load_settings
 from fastapi import Depends, FastAPI
 from jwks_cache import JwksCache
 from responses import UTF8JSONResponse, build_admin_response, build_index_response, build_me_response
-
 
 # 起動時に設定を読み込み、JWT 検証に使う部品をここで配線する。
 settings = load_settings()

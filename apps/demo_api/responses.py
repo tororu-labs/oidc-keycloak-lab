@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi.responses import JSONResponse
-
 from auth import build_claim_summary
 from config import Settings
+from fastapi.responses import JSONResponse
 
 
 # 日本語をそのまま返せる JSON レスポンス設定。

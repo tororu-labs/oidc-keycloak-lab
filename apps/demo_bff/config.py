@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-
 DEFAULT_SESSION_SECRET = "change-this-session-secret"
 DEFAULT_CLIENT_SECRET = "change-this-client-secret"
 
@@ -72,7 +71,5 @@ def load_settings() -> tuple[Settings, list[str]]:
             "OIDC_CLIENT_SECRET が未設定です。Keycloak の demo-bff client secret を設定してください。"
         )
     if session_secret == DEFAULT_SESSION_SECRET:
-        configuration_issues.append(
-            "SESSION_SECRET が未設定です。Cookie 署名用のランダム文字列を設定してください。"
-        )
+        configuration_issues.append("SESSION_SECRET が未設定です。Cookie 署名用のランダム文字列を設定してください。")
     return settings, configuration_issues

@@ -167,7 +167,7 @@ def configuration_issue_markup(configuration_issues: list[str]) -> str:
     return (
         '<div class="callout danger">'
         "<strong>設定が未完了です。</strong>"
-        "<p class=\"muted\">この状態でも画面は開けますが、/login は開始できません。</p>"
+        '<p class="muted">この状態でも画面は開けますが、/login は開始できません。</p>'
         f"<ul>{items}</ul>"
         "</div>"
     )
@@ -325,11 +325,7 @@ def render_error_page(
     status_code: int,
     error_stage: str | None = None,
 ) -> HTMLResponse:
-    stage_markup = (
-        f'<p class="muted">error_stage: <code>{escape(error_stage)}</code></p>'
-        if error_stage
-        else ""
-    )
+    stage_markup = f'<p class="muted">error_stage: <code>{escape(error_stage)}</code></p>' if error_stage else ""
     body = f"""
 <h1>{escape(title)}</h1>
 <div class="callout danger">

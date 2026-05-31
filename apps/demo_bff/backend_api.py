@@ -4,10 +4,8 @@ import logging
 from typing import Any
 
 import httpx
-from fastapi.responses import JSONResponse
-
 from config import Settings
-
+from fastapi.responses import JSONResponse
 
 logger = logging.getLogger("uvicorn.error")
 

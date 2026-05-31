@@ -6,11 +6,9 @@ from typing import Any
 import httpx
 from authlib.jose import JsonWebKey, jwt
 from authlib.jose.errors import BadSignatureError, ExpiredTokenError, JoseError
-from fastapi import Depends, Header, HTTPException
-
 from config import Settings
+from fastapi import Depends, Header, HTTPException
 from jwks_cache import JwksCache
-
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -80,8 +78,7 @@ async def load_jwks(
             status_code=503,
             detail={
                 "message": (
-                    "Keycloak の JWKS を取得できませんでした。"
-                    f" Keycloak が停止している可能性があります。 detail={exc}"
+                    f"Keycloak の JWKS を取得できませんでした。 Keycloak が停止している可能性があります。 detail={exc}"
                 ),
                 "error_stage": "keycloak_jwks",
             },

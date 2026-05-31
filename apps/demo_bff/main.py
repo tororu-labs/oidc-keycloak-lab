@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Any
 from urllib.parse import urlencode
 
 from auth import build_user_summary, decode_jwt_payload, sanitize_next_path
@@ -19,7 +20,6 @@ from views import (
     render_home,
     render_profile_page,
 )
-
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -89,10 +89,7 @@ async def auth_callback(request: Request):
     try:
         token = await app.state.oauth.keycloak.authorize_access_token(request)
     except OAuthError as exc:
-        message = (
-            "Keycloak との認可処理に失敗しました。"
-            f" error={exc.error!r}, description={exc.description!r}"
-        )
+        message = f"Keycloak との認可処理に失敗しました。 error={exc.error!r}, description={exc.description!r}"
         logger.warning(
             "stage=bff_callback_error error=%s description=%s",
             exc.error,
@@ -175,7 +172,7 @@ async def admin(request: Request):
 
 
 @app.get("/api/me", response_model=None)
-async def api_me(request: Request) -> JSONResponse | RedirectResponse:
+async def api_me(request: Request) -> JSONResponse | RedirectResponse | HTMLResponse:
     session_info = get_active_session(request)
     if session_info is None:
         return RedirectResponse("/login?next=/api/me", status_code=303)
@@ -186,7 +183,7 @@ async def api_me(request: Request) -> JSONResponse | RedirectResponse:
 
 
 @app.get("/api/admin-data", response_model=None)
-async def api_admin_data(request: Request) -> JSONResponse | RedirectResponse:
+async def api_admin_data(request: Request) -> JSONResponse | RedirectResponse | HTMLResponse:
     session_info = get_active_session(request)
     if session_info is None:
         return RedirectResponse("/login?next=/api/admin-data", status_code=303)
