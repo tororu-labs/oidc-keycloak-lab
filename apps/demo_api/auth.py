@@ -4,10 +4,11 @@ import logging
 from typing import Any
 
 import httpx
-from authlib.jose import JsonWebKey, jwt
-from authlib.jose.errors import BadSignatureError, ExpiredTokenError, JoseError
 from config import Settings
 from fastapi import Depends, Header, HTTPException
+from joserfc import jwt
+from joserfc.errors import BadSignatureError, ExpiredTokenError, JoseError
+from joserfc.jwk import KeySet
 from jwks_cache import JwksCache
 
 logger = logging.getLogger("uvicorn.error")
@@ -96,7 +97,7 @@ async def load_jwks(
             },
         ) from exc
 
-    return cache.set(JsonWebKey.import_key_set(response.json()))
+    return cache.set(KeySet.import_key_set(response.json()))
 
 
 # FastAPI の Depends で使える token 検証関数を組み立てる。
@@ -106,30 +107,29 @@ def build_verify_access_token(settings: Settings, cache: JwksCache):
     ) -> dict[str, Any]:
         token = parse_bearer_token(authorization)
         # 07: claims_options = {"iss": {"essential": True, "value": settings.issuer}}  # 08 で aud 追加により置き換え
-        claims_options = {  # 08: aud 検証を追加
-            "iss": {"essential": True, "value": settings.issuer},
-            "aud": {"essential": True, "value": settings.expected_audience},
-        }
+        # 08: aud 検証を追加。joserfc の JWTClaimsRegistry で iss / aud を宣言する。
+        # leeway は JWTClaimsRegistry に渡す（authlib の claims.validate(leeway=...) に相当）。
+        registry = jwt.JWTClaimsRegistry(
+            iss={"essential": True, "value": settings.issuer},
+            aud={"essential": True, "value": settings.expected_audience},
+            leeway=settings.clock_skew_seconds,
+        )
 
         for attempt in range(2):
             key_set = await load_jwks(settings, cache, force_refresh=attempt == 1)
             try:
-                claims = jwt.decode(token, key_set, claims_options=claims_options)
-                claims.validate(leeway=settings.clock_skew_seconds)
-                # 07: logger.info(
-                #     "stage=backend_authentication_success user=%s iss=%s roles=%s",
-                #     claims.get("preferred_username"),
-                #     claims.get("iss"),
-                #     extract_roles(dict(claims)),
-                # )  # 08 で aud をログに追加したため置き換え
-                logger.info(  # 08: aud をログに追加
+                # joserfc では kid 不一致も BadSignatureError（JoseError）として扱われるため、
+                # authlib 時代の except ValueError ブロックは不要になった。
+                result = jwt.decode(token, key_set)
+                registry.validate(result.claims)
+                logger.info(
                     "stage=backend_authentication_success user=%s iss=%s aud=%s roles=%s",
-                    claims.get("preferred_username"),
-                    claims.get("iss"),
-                    claims.get("aud"),
-                    extract_roles(dict(claims)),
+                    result.claims.get("preferred_username"),
+                    result.claims.get("iss"),
+                    result.claims.get("aud"),
+                    extract_roles(result.claims),
                 )
-                return dict(claims)
+                return result.claims
             except BadSignatureError:
                 if attempt == 0:
                     cache.clear()

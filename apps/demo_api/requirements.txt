@@ -1,4 +1,4 @@
 fastapi>=0.115,<1.0
 uvicorn>=0.34,<1.0
 httpx>=0.28,<1.0
-authlib>=1.6,<2.0
+joserfc>=1.0,<2.0
