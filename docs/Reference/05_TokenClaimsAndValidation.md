@@ -7,7 +7,7 @@
 - access token に含まれる主要な claim の意味と役割
 - Backend API が検証する claim の順序と各検証の意図
 - `aud` と `azp` の使い分け
-- Authlib の `claims_options` の仕組みと例外型の対応
+- joserfc の `JWTClaimsRegistry` の仕組みと例外型の対応
 
 ------
 
@@ -88,17 +88,18 @@ Backend API は、token を受け取ったときに次の順序で検証を行�
 
 ------
 
-## Authlib の `claims_options` の仕組み
+## joserfc の `JWTClaimsRegistry` の仕組み
 
-Backend API では、Authlib の `jwt.decode` に `claims_options` を渡して claim 検証を設定している。
+Backend API では、joserfc の `JWTClaimsRegistry` に検証ルールをまとめ、`jwt.decode` の後に `registry.validate()` を呼んで claim を検証している。
 
 ~~~python
-claims_options = {
-    "iss": {"essential": True, "value": settings.issuer},
-    "aud": {"essential": True, "value": settings.expected_audience},
-}
-claims = jwt.decode(token, key_set, claims_options=claims_options)
-claims.validate(leeway=settings.clock_skew_seconds)
+registry = jwt.JWTClaimsRegistry(
+    iss={"essential": True, "value": settings.issuer},
+    aud={"essential": True, "value": settings.expected_audience},
+    leeway=settings.clock_skew_seconds,
+)
+result = jwt.decode(token, key_set)
+registry.validate(result.claims)
 ~~~
 
 各フィールドの意味:
@@ -108,21 +109,19 @@ claims.validate(leeway=settings.clock_skew_seconds)
 | `essential: True` | この claim が token に存在しなければ検証失敗にする |
 | `value` | claim の値がこの値と一致しなければ検証失敗にする |
 
-`claims.validate()` に渡す `leeway` は、時刻のずれを許容する秒数である。サーバ間のクロックずれを考慮して、`exp` の境界付近で不必要な検証失敗を防ぐ。
+`leeway` は `JWTClaimsRegistry` のコンストラクタに渡す。時刻のずれを許容する秒数で、サーバ間のクロックずれを考慮して `exp` の境界付近での不必要な検証失敗を防ぐ。
 
 ### 例外型と失敗理由の対応
 
-Authlib が送出する例外型と、それが意味する失敗理由の対応は次のとおり。
+joserfc が送出する例外型と、それが意味する失敗理由の対応は次のとおり。
 
 | 例外型 | 意味 | ログの `reason` |
 |--------|------|----------------|
 | `BadSignatureError` | 署名が不正 | `bad_signature` |
 | `ExpiredTokenError` | `exp` が期限切れ | `expired_token` |
-| `InvalidClaimError` | claim の値が期待と一致しない（`iss`・`aud` 不一致など） | `jose_error` |
-| `MissingClaimError` | `essential: True` の claim が存在しない | `jose_error` |
-| `JoseError`（基底クラス） | 上記以外の JWT 検証エラー | `jose_error` |
+| `JoseError`（基底クラス） | claim 不一致・claim 欠落など上記以外の JWT 検証エラー | `jose_error` |
 
-`BadSignatureError` と `ExpiredTokenError` は個別に捕捉してエラー内容を明確にし、それ以外は `JoseError` でまとめて捕捉している（`apps/demo_api/auth.py` 参照）。
+`BadSignatureError` と `ExpiredTokenError` は個別に捕捉してエラー内容を明確にし、それ以外（`iss`・`aud` 不一致、`essential` な claim の欠落など）は `JoseError` でまとめて捕捉している（`apps/demo_api/auth.py` 参照）。
 
 ------
 
