@@ -302,7 +302,7 @@ Keycloak 側で `aud` が付与されていない token を使うと、`aud` 検
 
 補足:
 
-- authlib は `aud` が token に存在しない場合は `Missing claim: aud`、存在するが合わない場合は `Invalid claim: aud` を返す
+- joserfc は `aud` が token に存在しない場合は `Missing claim: aud`、存在するが合わない場合は `Invalid claim: aud` を返す
 - どちらのケースも `JoseError` を継承しているため、既存の `except JoseError` ブロックで捕捉される
 
 ------

@@ -136,27 +136,27 @@ IdP がログイン後にブラウザを戻してよい先の URL。Keycloak で
 
 ## kid（Key ID）
 
-JWT ヘッダーや JWKS に含まれる鍵識別子。複数の鍵が存在するとき、検証に使う鍵を絞り込むためのヒントとして使われる。authlib は encode 時に header の kid を署名鍵の実際の kid で上書きする。
+JWT ヘッダーや JWKS に含まれる鍵識別子。複数の鍵が存在するとき、検証に使う鍵を絞り込むためのヒントとして使われる。joserfc は `jwt.encode` 時に署名鍵の kid を JWT header に自動設定する。
 
 ## leeway（時刻ずれ許容）
 
-JWT の `exp` 検証時に許容する時刻のずれ幅（秒）。NTP ずれや処理遅延を吸収するために設定する。authlib では `claims.validate(leeway=N)` に渡す。Authlib は `clock_skew_seconds` の設定値でこれを制御する。
+JWT の `exp` 検証時に許容する時刻のずれ幅（秒）。NTP ずれや処理遅延を吸収するために設定する。joserfc では `JWTClaimsRegistry(leeway=N)` のコンストラクタに渡す。`clock_skew_seconds` の設定値でこれを制御する。
 
 ## alg=none 攻撃
 
-JWT の `alg` ヘッダーを `none` にすることで署名検証を回避しようとする攻撃。authlib はデフォルトで `none` アルゴリズムを登録しないため、キー検索に失敗して `JoseError` を送出する。
+JWT の `alg` ヘッダーを `none` にすることで署名検証を回避しようとする攻撃。joserfc はデフォルトで `none` アルゴリズムを受け付けないため、デコード時に `JoseError` を送出する。
 
 ## BadSignatureError
 
-authlib が JWT の署名検証に失敗したときに送出する例外。`JoseError` の派生クラス。`auth.py` では JWKS キーのローテーション可能性を考慮し、一度キャッシュをクリアして再取得 (retry) する。
+joserfc が JWT の署名検証に失敗したときに送出する例外。`JoseError` の派生クラス。`auth.py` では JWKS キーのローテーション可能性を考慮し、一度キャッシュをクリアして再取得 (retry) する。
 
 ## ExpiredTokenError
 
-authlib が `exp` の期限切れを検出したときに送出する例外。`JoseError` の派生クラス。leeway の範囲内であれば送出されない。
+joserfc が `exp` の期限切れを検出したときに送出する例外。`JoseError` の派生クラス。leeway の範囲内であれば送出されない。
 
 ## JoseError
 
-authlib の JWT / JWS 検証系の基底例外クラス。`BadSignatureError`・`ExpiredTokenError`・`InvalidClaimError`・`MissingClaimError` などがこの派生クラスになる。
+joserfc の JWT / JWS 検証系の基底例外クラス。`BadSignatureError`・`ExpiredTokenError`・`InvalidClaimError`・`MissingClaimError` などがこの派生クラスになる。
 
 ## pytest-asyncio
 

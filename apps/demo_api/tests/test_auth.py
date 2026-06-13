@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 import json
 import time
-from typing import Any, cast
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -208,14 +208,15 @@ async def test_tampered_payload(
         with pytest.raises(HTTPException) as exc_info:
             await verify(authorization=f"Bearer {tampered}")
     assert exc_info.value.status_code == 401
-    assert cast(dict[str, Any], exc_info.value.detail)["error_stage"] == "backend_authentication"
+    assert isinstance(exc_info.value.detail, dict)
+    assert exc_info.value.detail["error_stage"] == "backend_authentication"
 
 
 async def test_alg_none(verify_token: Any) -> None:
     """alg=none 攻撃: 署名なし token は JoseError として弾かれ 401 になる。
 
-    Authlib はデフォルトで none アルゴリズムを登録しないため、
-    キー検索に失敗して JoseError が発生する。
+    joserfc はデフォルトで none アルゴリズムを受け付けないため、
+    デコード時に JoseError が発生する。
     """
     payload = make_valid_payload()
     none_token = make_none_alg_token(payload)
@@ -246,7 +247,8 @@ async def test_token_signed_with_different_key_is_rejected(
         with pytest.raises(HTTPException) as exc_info:
             await verify(authorization=f"Bearer {token}")
     assert exc_info.value.status_code == 401
-    assert cast(dict[str, Any], exc_info.value.detail)["error_stage"] == "backend_authentication"
+    assert isinstance(exc_info.value.detail, dict)
+    assert exc_info.value.detail["error_stage"] == "backend_authentication"
 
 
 async def test_expired_token(rsa_key: Any, verify_token: Any) -> None:
@@ -262,7 +264,7 @@ async def test_expired_token(rsa_key: Any, verify_token: Any) -> None:
 async def test_exp_boundary_within_leeway(rsa_key: Any, primed_cache: JwksCache) -> None:
     """exp 境界（leeway 内）: leeway=30s の設定では 10 秒前期限切れでも通る。
 
-    clock_skew_seconds は Authlib の validate(leeway=...) に渡される。
+    clock_skew_seconds は JWTClaimsRegistry の leeway に渡される。
     NTP ずれや処理遅延を吸収するために使う。
     """
     settings_with_leeway = Settings(
@@ -283,11 +285,11 @@ async def test_exp_boundary_within_leeway(rsa_key: Any, primed_cache: JwksCache)
 
 
 async def test_missing_exp(rsa_key: Any, verify_token: Any) -> None:
-    """exp 欠落: exp がない token は Authlib の validate() を通過する（設計上の把握ポイント）。
+    """exp 欠落: exp がない token は joserfc の validate() を通過する（設計上の把握ポイント）。
 
-    RFC 7519 で exp は必須でなく、Authlib もデフォルトでは要求しない。
-    この挙動を知ったうえで、必要なら claims_options に
-        "exp": {"essential": True}
+    RFC 7519 で exp は必須でなく、joserfc もデフォルトでは要求しない。
+    この挙動を知ったうえで、必要なら JWTClaimsRegistry に
+        exp={"essential": True}
     を追加して必須化する。
     """
     payload = make_valid_payload()

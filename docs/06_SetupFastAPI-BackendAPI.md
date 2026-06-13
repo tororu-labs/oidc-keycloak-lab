@@ -77,7 +77,7 @@ source .venv/bin/activate
 判定:
 
 - `./.venv/bin/python -m pip install -r apps/demo_api/requirements.txt` が成功する
-- `./.venv/bin/python -m pip show fastapi authlib uvicorn httpx` で導入を確認できる
+- `./.venv/bin/python -m pip show fastapi joserfc uvicorn httpx` で導入を確認できる
 
 ------
 
