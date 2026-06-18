@@ -161,3 +161,19 @@ joserfc の JWT / JWS 検証系の基底例外クラス。`BadSignatureError`・
 ## pytest-asyncio
 
 pytest で `async def` の非同期テスト関数を実行するためのプラグイン。`asyncio_mode = "auto"` を設定すると `@pytest.mark.asyncio` マーカーなしで非同期テストを書ける。
+
+## code_verifier
+
+PKCE フローの開始時に SPA が生成するランダム文字列。token endpoint に提出することで「この認可リクエストを始めた本人である」ことを証明する。sessionStorage に一時保管し、token 交換後は即削除する。
+
+## code_challenge
+
+`code_verifier` を SHA-256 でハッシュして Base64URL エンコードした値。認可リクエストに含めて Keycloak に送る。Keycloak は後で `SHA-256(code_verifier) == code_challenge` が成立するかを確認する。
+
+## CORS（Cross-Origin Resource Sharing）
+
+ブラウザが異なるオリジン（ドメイン・ポートが異なる URL）へのリクエストを制限する仕組み。SPA（`http://localhost:3000`）から Backend API（`http://localhost:8001`）を直接呼ぶ場合、API 側で `Access-Control-Allow-Origin` ヘッダーを返すことで許可できる。
+
+## sessionStorage
+
+ブラウザが提供するタブ単位のストレージ。ページをまたいで値を保持できるが、タブを閉じると消える。PKCE の `code_verifier` のようにリダイレクトをまたぐが長期保存は不要な値の保管に使う。

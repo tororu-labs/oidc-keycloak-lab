@@ -67,7 +67,7 @@ docs/                                  docs/Reference/
 | Phase 00 | Reference 切り出し | 基礎 | `Reference/05_TokenClaimsAndValidation.md` | ✅ 完了 |
 | Phase 01 | ハンズオン + Reference | 基礎 | `09_SetupClientScopeAndMapper.md` + `Reference/06_ClientScopeAndMapperTypes.md` | ✅ 完了 |
 | Phase 02 | ハンズオン | 基礎 | `10_SetupJWTEdgeCaseTests.md` | ✅ 完了 |
-| Phase 03 | ハンズオン + Reference | 基礎 | `11_SetupNextJsSPAWithPKCE.md` + `Reference/08_PublicClientAndPKCE.md` | 🔲 未着手 |
+| Phase 03 | ハンズオン + Reference | 基礎 | `11_SetupNextJsSPAWithPKCE.md` + `Reference/08_PublicClientAndPKCE.md` | ✅ 完了 |
 | Phase 04 | ハンズオン | 基礎 | `12_SetupRefreshAndLogout.md` | 🔲 未着手 |
 | Phase 05 | ハンズオン + Reference | 基礎/観測 | `13_SetupOTelInstrumentation.md` + `Reference/07_Observability.md` | 🔲 未着手 |
 | Phase 06 | ハンズオン + Reference | 応用/AI | `14_SetupSecurityAuditAgent.md` + `Reference/10_AuditAgentDesign.md` | 🔲 未着手 |
@@ -495,7 +495,7 @@ MCP（Model Context Protocol）は AI エージェントと外部システムを
 
 ## 転職活動（6〜7月）との対応
 
-現在地: **Phase 02 完了 / Phase 03 着手前**
+現在地: **Phase 03 完了 / Phase 04 着手前**
 
 ```
                      現在 ─────── 6月中旬 ────── 6月下旬 ────── 7月（活動開始）

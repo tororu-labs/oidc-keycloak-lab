@@ -5,6 +5,7 @@ from typing import Any
 from auth import build_require_admin_claims, build_verify_access_token
 from config import load_settings
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from jwks_cache import JwksCache
 from responses import UTF8JSONResponse, build_admin_response, build_index_response, build_me_response
 
@@ -12,6 +13,16 @@ from responses import UTF8JSONResponse, build_admin_response, build_index_respon
 settings = load_settings()
 
 app = FastAPI(title="FastAPI Backend API Demo", default_response_class=UTF8JSONResponse)
+
+# SPA（demo-web-spa）からのブラウザ直接アクセスを許可する。
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET"],
+    allow_headers=["Authorization"],
+)
+
 app.state.jwks_cache = JwksCache(settings.jwks_cache_ttl_seconds)
 
 verify_access_token = build_verify_access_token(settings, app.state.jwks_cache)

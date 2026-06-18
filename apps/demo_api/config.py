@@ -11,7 +11,8 @@ class Settings:
     keycloak_realm: str
     jwks_cache_ttl_seconds: int
     clock_skew_seconds: int
-    expected_audience: str  # 08: aud 検証のために追加
+    expected_audience: str
+    cors_allowed_origins: list[str]
 
     @property
     def issuer(self) -> str:
@@ -29,5 +30,6 @@ def load_settings() -> Settings:
         keycloak_realm=os.getenv("KEYCLOAK_REALM", "lab"),
         jwks_cache_ttl_seconds=int(os.getenv("JWKS_CACHE_TTL_SECONDS", "300")),
         clock_skew_seconds=int(os.getenv("CLOCK_SKEW_SECONDS", "30")),
-        expected_audience=os.getenv("EXPECTED_AUDIENCE", "demo-api"),  # 08: aud 検証のために追加
+        expected_audience=os.getenv("EXPECTED_AUDIENCE", "demo-api"),
+        cors_allowed_origins=os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(","),
     )

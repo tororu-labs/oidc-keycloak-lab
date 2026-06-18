@@ -102,6 +102,7 @@ def test_settings() -> Settings:
         jwks_cache_ttl_seconds=300,
         clock_skew_seconds=0,
         expected_audience=AUDIENCE,
+        cors_allowed_origins=["http://localhost:3000"],
     )
 
 
@@ -273,6 +274,7 @@ async def test_exp_boundary_within_leeway(rsa_key: Any, primed_cache: JwksCache)
         jwks_cache_ttl_seconds=300,
         clock_skew_seconds=30,
         expected_audience=AUDIENCE,
+        cors_allowed_origins=["http://localhost:3000"],
     )
     verify = build_verify_access_token(settings_with_leeway, primed_cache)
 

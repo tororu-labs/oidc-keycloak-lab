@@ -164,6 +164,35 @@ uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
 
 ------
 
+## パターン 3: SPA + Backend API を起動する
+
+`docs/11` を進めるときの構成である。  
+Backend API と SPA は別ターミナルで起動する。BFF は不要。
+
+### Backend API の起動（CORS 設定あり）
+
+~~~zsh
+source .venv/bin/activate
+export KEYCLOAK_BASE_URL=http://localhost:8080
+export KEYCLOAK_REALM=lab
+export CORS_ALLOWED_ORIGINS=http://localhost:3000
+uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
+~~~
+
+### SPA の起動
+
+~~~zsh
+cd apps/demo_web_spa
+npm install   # 初回のみ
+npm run dev
+~~~
+
+- `http://localhost:3000` を開き、ログインボタンが表示されることを確認する
+- Keycloak で `alice` ログイン後、「ログイン済み」と表示されることを確認する
+- 「Backend API (/me) を直接呼ぶ」で `200` が返ることを確認する
+
+------
+
 ## 停止方法
 
 ~~~zsh
