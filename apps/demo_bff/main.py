@@ -2,15 +2,17 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from typing import Any
 from urllib.parse import urlencode
 
-from auth import build_user_summary, decode_jwt_payload, sanitize_next_path
+import httpx
+from auth import LogoutTokenError, build_user_summary, decode_jwt_payload, sanitize_next_path, verify_logout_token
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from backend_api import build_backend_json_response, fetch_backend_api_result
 from config import load_settings
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from session_store import InMemorySessionStore
 from starlette.middleware.sessions import SessionMiddleware
 from views import (
@@ -58,6 +60,79 @@ def get_active_session(request: Request) -> dict[str, Any] | None:
     if session_info is None and session_id:
         request.session.clear()
     return session_info
+
+
+# refresh token を使って access token を更新し、session を更新する。
+# 成功時は更新後の session_info を返す。失敗時は None を返す。
+async def _refresh_access_token(session_id: str, session_info: dict[str, Any]) -> dict[str, Any] | None:
+    refresh_token = session_info.get("refresh_token")
+    if not refresh_token:
+        return None
+
+    token_endpoint = f"{settings.issuer}/protocol/openid-connect/token"
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                token_endpoint,
+                data={
+                    "grant_type": "refresh_token",
+                    "client_id": settings.oidc_client_id,
+                    "client_secret": settings.oidc_client_secret,
+                    "refresh_token": refresh_token,
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"},
+            )
+    except httpx.RequestError as exc:
+        logger.warning("stage=bff_token_refresh_request_error detail=%s", str(exc))
+        return None
+
+    if not response.is_success:
+        logger.warning(
+            "stage=bff_token_refresh_failed status=%s body=%s",
+            response.status_code,
+            response.text[:200],
+        )
+        return None
+
+    token = response.json()
+    new_access_claims = decode_jwt_payload(token.get("access_token"))
+    new_session_info = {
+        **session_info,
+        "access_token": token.get("access_token"),
+        "refresh_token": token.get("refresh_token", refresh_token),
+        "access_claims": new_access_claims,
+        "keycloak_sid": new_access_claims.get("sid", session_info.get("keycloak_sid")),
+    }
+    app.state.session_store.update(session_id, new_session_info)
+    return new_session_info
+
+
+# session を取得し、access token が期限切れなら自動で refresh する。
+async def get_session_with_refresh(request: Request) -> dict[str, Any] | None:
+    session_id: str | None = request.session.get("sid")
+    session_info = app.state.session_store.get(session_id)
+    if session_info is None:
+        if session_id:
+            request.session.clear()
+        return None
+
+    # access token の有効期限を確認（30 秒のバッファで早めに refresh する）
+    exp = session_info.get("access_claims", {}).get("exp", 0)
+    if exp - 30 > time.time():
+        return session_info
+
+    username = session_info["user"]["preferred_username"]
+    logger.info("stage=bff_token_refresh_start user=%s", username)
+    assert session_id is not None  # session_store.get が None を返した後は未到達
+    new_session_info = await _refresh_access_token(session_id, session_info)
+    if new_session_info is None:
+        logger.warning("stage=bff_token_refresh_error user=%s reason=refresh_failed", username)
+        app.state.session_store.delete(session_id)
+        request.session.clear()
+        return None
+
+    logger.info("stage=bff_token_refresh_success user=%s", username)
+    return new_session_info
 
 
 # ここから下は BFF の画面と認証フローを受け持つ route 群。
@@ -120,10 +195,12 @@ async def auth_callback(request: Request):
 
     session_payload = {
         "access_token": token.get("access_token"),
+        "refresh_token": token.get("refresh_token"),
         "id_token": token.get("id_token"),
         "user": user,
         "access_claims": access_claims,
         "id_claims": id_claims,
+        "keycloak_sid": access_claims.get("sid"),
     }
     request.session["sid"] = app.state.session_store.create(session_payload)
     next_path = sanitize_next_path(request.session.pop("after_login_path", "/me"))
@@ -173,7 +250,7 @@ async def admin(request: Request):
 
 @app.get("/api/me", response_model=None)
 async def api_me(request: Request) -> JSONResponse | RedirectResponse | HTMLResponse:
-    session_info = get_active_session(request)
+    session_info = await get_session_with_refresh(request)
     if session_info is None:
         return RedirectResponse("/login?next=/api/me", status_code=303)
     payload, status_code = await fetch_backend_api_result(settings, session_info, "/me")
@@ -184,13 +261,47 @@ async def api_me(request: Request) -> JSONResponse | RedirectResponse | HTMLResp
 
 @app.get("/api/admin-data", response_model=None)
 async def api_admin_data(request: Request) -> JSONResponse | RedirectResponse | HTMLResponse:
-    session_info = get_active_session(request)
+    session_info = await get_session_with_refresh(request)
     if session_info is None:
         return RedirectResponse("/login?next=/api/admin-data", status_code=303)
     payload, status_code = await fetch_backend_api_result(settings, session_info, "/admin-data")
     if request.query_params.get("raw") == "1":
         return build_backend_json_response(payload, status_code)
     return render_backend_result_page("/api/admin-data", "/api/admin-data", payload, status_code)
+
+
+@app.post("/backchannel-logout")
+async def backchannel_logout(request: Request) -> Response:
+    form = await request.form()
+    logout_token_str = form.get("logout_token")
+    if not logout_token_str:
+        logger.warning("stage=backchannel_logout_error reason=missing_logout_token")
+        return Response(
+            status_code=400,
+            content="logout_token が見つかりません",
+            media_type="text/plain; charset=utf-8",
+        )
+
+    try:
+        keycloak_sid = await verify_logout_token(str(logout_token_str), settings)
+    except LogoutTokenError as exc:
+        logger.warning("stage=backchannel_logout_error reason=invalid_token detail=%s", str(exc))
+        return Response(status_code=400, content=str(exc), media_type="text/plain; charset=utf-8")
+
+    result = app.state.session_store.find_by_keycloak_sid(keycloak_sid)
+    if result:
+        session_id, session_data = result
+        username = session_data.get("user", {}).get("preferred_username", "unknown")
+        app.state.session_store.delete(session_id)
+        logger.info(
+            "stage=backchannel_logout_success keycloak_sid=%s user=%s",
+            keycloak_sid,
+            username,
+        )
+    else:
+        logger.info("stage=backchannel_logout_no_session keycloak_sid=%s", keycloak_sid)
+
+    return Response(status_code=200)
 
 
 @app.post("/logout")

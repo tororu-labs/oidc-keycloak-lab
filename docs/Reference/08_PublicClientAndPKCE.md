@@ -115,8 +115,97 @@ Keycloak にリダイレクトして戻ってくるまでの間、ページの�
 
 ------
 
+## Refresh Token のライフサイクルと保管責任
+
+### Refresh Token とは
+
+access token の有効期限（通常数分）が切れたとき、ユーザーを再ログインさせずに新しい access token を取得するために使う token。有効期限は access token より長く（数十分〜数日）設定することが多い。
+
+### SPA と BFF の保管責任の違い
+
+| 構成 | refresh token の保管場所 | 安全か |
+|------|------------------------|-------|
+| SPA（ブラウザのみ） | localStorage / sessionStorage | XSS で盗まれるリスクが高い |
+| SPA + HttpOnly Cookie | Cookie（バックエンド経由） | JS から読めないため比較的安全 |
+| BFF 構成 | サーバ側 session（メモリ / DB） | ブラウザに渡らないため安全 |
+
+**「SPA では refresh token を localStorage に置けない」という問題**
+
+refresh token を localStorage に保管すると、XSS 攻撃で盗まれた場合に長期間の不正アクセスを許してしまう。これが「SPA 単体では refresh token を安全に扱えない」理由であり、BFF を経由する構成が推奨される理由の一つである。
+
+### Refresh Token の自動更新の仕組み（BFF）
+
+BFF は次のフローで access token を自動更新する。
+
+~~~text
+[ブラウザ]         [BFF]              [Keycloak]
+    |                |                     |
+    | GET /api/me ──→|                     |
+    |                | access_token の exp を確認
+    |                | 期限切れ（または 30 秒以内）
+    |                | refresh_token grant ─→|
+    |                |                     | 新しい access_token を発行
+    |                | ←─ 新 access_token ──|
+    |                | session を更新       |
+    |                | Backend API を呼ぶ  |
+    | ←─ 200 ────────|                     |
+~~~
+
+refresh が失敗した場合（refresh token も期限切れ）は、session を削除してログイン画面にリダイレクトする。
+
+------
+
+## Back-channel Logout と RP-initiated Logout の対比
+
+### 2 種類の logout
+
+| 種別 | 起点 | 通知方法 | ブラウザが必要か |
+|------|------|---------|---------------|
+| RP-initiated Logout | ユーザーがアプリ内で「ログアウト」ボタンを押す | ブラウザが Keycloak logout endpoint にリダイレクト | 必要 |
+| Back-channel Logout | 管理者が Keycloak で session を強制終了、または他の RP がログアウトした | Keycloak がサーバーに直接 HTTP POST を送る | 不要 |
+
+### Back-channel Logout のフロー
+
+~~~text
+[Keycloak 管理コンソール]  [Keycloak]              [BFF]
+         |                     |                     |
+         | session を強制終了 ──→|                     |
+         |                     | logout token を生成  |
+         |                     | POST /backchannel-logout ──→|
+         |                     |                     | logout token を検証
+         |                     |                     | sid claim で session を特定
+         |                     |                     | session を削除
+         |                     | ←─ 200 OK ──────────|
+~~~
+
+ブラウザが閉じられていても、管理者が session を終了させた場合でも、BFF 側の session を即座に削除できる点が RP-initiated Logout との大きな違いである。
+
+### Logout Token の構造と検証観点
+
+logout token は Keycloak が発行する JWT で、通常の access token とは claims の構成が異なる。
+
+| claim | 内容 |
+|-------|------|
+| `iss` | Keycloak の issuer URL |
+| `aud` | 通知先の client_id（demo-bff） |
+| `iat` | 発行時刻 |
+| `jti` | token の一意識別子（リプレイ攻撃対策） |
+| `events` | `{"http://schemas.openid.net/event/backchannel-logout": {}}` |
+| `sid` | Keycloak の session ID（BFF の session と紐付けるために使う） |
+| `sub` | ログアウト対象のユーザー ID（オプション） |
+
+BFF は logout token を受け取ったとき、以下を検証する。
+
+1. 署名検証（Keycloak の JWKS を取得して確認）
+2. `events` claim に backchannel-logout イベントが含まれていること
+3. `nonce` が含まれていないこと（logout token の仕様上 nonce は禁止）
+4. `sid` claim が存在すること
+
+------
+
 ## 関連ドキュメント
 
 - [11_SetupNextJsSPAWithPKCE.md](../11_SetupNextJsSPAWithPKCE.md)
+- [12_SetupRefreshAndLogout.md](../12_SetupRefreshAndLogout.md)
 - [05_TokenClaimsAndValidation.md](./05_TokenClaimsAndValidation.md)
 - [04_ClientAndTokenRoles.md](./04_ClientAndTokenRoles.md)

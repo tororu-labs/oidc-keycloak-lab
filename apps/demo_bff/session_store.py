@@ -36,6 +36,23 @@ class InMemorySessionStore:
         session["expires_at"] = time.time() + self.ttl_seconds
         return session
 
+    def update(self, session_id: str, payload: dict[str, Any]) -> None:
+        """既存 session のデータを更新する（TTL はリセットしない）。"""
+        if session_id in self._store:
+            existing = self._store[session_id]
+            self._store[session_id] = {
+                **payload,
+                "created_at": existing["created_at"],
+                "expires_at": existing["expires_at"],
+            }
+
+    def find_by_keycloak_sid(self, keycloak_sid: str) -> tuple[str, dict[str, Any]] | None:
+        """Keycloak の session ID (sid claim) から BFF session を検索する。"""
+        for session_id, session in self._store.items():
+            if session.get("keycloak_sid") == keycloak_sid:
+                return session_id, session
+        return None
+
     def delete(self, session_id: str | None) -> None:
         if session_id:
             self._store.pop(session_id, None)

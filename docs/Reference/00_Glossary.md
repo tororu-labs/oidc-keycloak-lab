@@ -177,3 +177,15 @@ PKCE フローの開始時に SPA が生成するランダム文字列。token e
 ## sessionStorage
 
 ブラウザが提供するタブ単位のストレージ。ページをまたいで値を保持できるが、タブを閉じると消える。PKCE の `code_verifier` のようにリダイレクトをまたぐが長期保存は不要な値の保管に使う。
+
+## back-channel logout
+
+Keycloak がサーバー間（HTTP）で直接ログアウト通知を送る仕組み。管理者が Keycloak で session を強制終了したとき、ブラウザを介さずに BFF の session を即座に削除できる。ブラウザが閉じられている状態でも機能する。
+
+## logout token
+
+back-channel logout 時に Keycloak が BFF に送る JWT。通常の access token と異なり、`events` claim に `"http://schemas.openid.net/event/backchannel-logout"` が含まれ、`sid` claim でどの session を削除すべきかを指定する。BFF 側は JWKS で署名を検証してから処理する。
+
+## RP-initiated logout
+
+ユーザーがアプリ（RP: Relying Party）の「ログアウト」ボタンを押したとき、ブラウザを Keycloak の logout endpoint にリダイレクトして session を終了させる仕組み。back-channel logout と異なり、ブラウザが必要。
