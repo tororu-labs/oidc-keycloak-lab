@@ -1,0 +1,10 @@
+# Next.js
+.next/
+next-env.d.ts
+
+# dependencies
+node_modules/
+
+# environment variables
+.env.local
+.env*.local
