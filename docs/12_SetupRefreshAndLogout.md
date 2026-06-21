@@ -209,7 +209,8 @@ Keycloak がセッション終了を BFF に通知できるように、`demo-bff
 
 | 設定項目 | 値 |
 |---------|---|
-| Backchannel logout URL | `http://localhost:8000/backchannel-logout` |
+| Front channel logout | OFF |
+| Backchannel logout URL | `http://host.docker.internal:8000/backchannel-logout` |
 | Backchannel logout session required | ON |
 | Backchannel logout revoke offline sessions | OFF |
 
@@ -219,8 +220,9 @@ Keycloak がセッション終了を BFF に通知できるように、`demo-bff
 
 補足:
 
+- **Front channel logout を OFF にする**。ON のままだと back-channel logout が使われず、通知が BFF に届かない
 - **Backchannel logout session required** を ON にすると、logout token に `sid` claim が含まれる。BFF はこの `sid` を使って削除対象の session を特定する
-- Keycloak（Docker コンテナ）から BFF（ホスト上の `localhost:8000`）に通知が届くには、Keycloak がホストの `localhost` を解決できる必要がある。Docker Desktop（Mac / Windows）を使っている場合は `host.docker.internal` が自動で解決されるが、`localhost` のままでも Docker Desktop では通ることが多い。通知が届かない場合は URL を `http://host.docker.internal:8000/backchannel-logout` に変えて試すこと（`docs/03_SetupDocker-Keycloak.md` 参照）
+- `host.docker.internal` は Docker Desktop（Mac / Windows）でホストマシンを指す特別なホスト名。Linux Docker の場合は Docker bridge の gateway IP（`ip route | grep default` で確認）を使う
 
 ------
 
