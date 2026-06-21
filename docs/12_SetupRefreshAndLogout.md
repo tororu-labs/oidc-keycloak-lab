@@ -38,18 +38,19 @@
 
 判定:
 
-- `alice` でログインして `http://localhost:8000/api/me` が `200` を返す
+- `alice` でログインして `http://localhost:8080/api/me` が `200` を返す
 
 ------
 
 ## この手順の流れ
 
 1. Keycloak の token 有効期限設定を確認する
-2. access token 期限切れを体験する
-3. refresh による自動更新を確認する
-4. Keycloak に Back-Channel Logout URL を設定する
-5. back-channel logout を体験する
-6. 失敗例を再現する
+2. SPA で access token 期限切れを体験する
+3. BFF を加えて refresh による自動更新を確認する
+4. URL 未設定のまま logout を試み、BFF に届かないことを確認する
+5. Keycloak に Back-Channel Logout URL を設定する
+6. back-channel logout を体験する
+7. 失敗例を再現する
 
 ------
 
@@ -77,16 +78,16 @@ Keycloak の管理コンソールで、token の TTL 設定を確認する。
 
 ------
 
-## Step 2: access token 期限切れを体験する
+## Step 2: SPA で access token 期限切れを体験する
 
-access token の TTL を短くして、期限切れが起きることを確認する。
+refresh token を持たない SPA で access token が切れると何が起きるかを確認する。
 
 ### Keycloak で TTL を変更する
 
 1. **Realm settings → Tokens** タブを開く
 2. **Access Token Lifespan** を `1 Minutes` に変更して **Save** をクリックする
 
-### BFF と Backend API を起動する
+### Backend API と SPA を起動する
 
 ~~~zsh
 # ターミナル 1: Backend API
@@ -96,7 +97,36 @@ export KEYCLOAK_REALM=lab
 export CORS_ALLOWED_ORIGINS=http://localhost:3000
 uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
 
-# ターミナル 2: BFF
+# ターミナル 2: SPA
+cd apps/demo_web_spa
+npm run dev
+~~~
+
+### 操作手順
+
+1. `http://localhost:3000` で `alice` としてログインする
+2. 1 分（TTL）が経過するまで待つ
+3. API を呼び出す操作（`/api/me` に相当する画面操作）を行う
+
+期待する見え方:
+
+- 画面に `401` エラーが表示される
+- SPA はユーザーに再ログインを要求する、またはエラー画面を表示する
+
+判定:
+
+- 1 分後に SPA が `401` エラーを表示する
+
+------
+
+## Step 3: BFF を加えて refresh による自動更新を確認する
+
+BFF を追加することで、同じ TTL 設定でも refresh が自動で動くことを確認する。
+
+### BFF を起動する
+
+~~~zsh
+# ターミナル 3: BFF（ターミナル 1・2 はそのまま）
 source .venv/bin/activate
 export KEYCLOAK_BASE_URL=http://localhost:8080
 export KEYCLOAK_REALM=lab
@@ -108,17 +138,7 @@ export SESSION_SECRET="$(.venv/bin/python -c 'import secrets; print(secrets.toke
 uvicorn main:app --app-dir apps/demo_bff --reload
 ~~~
 
-### この手順でやること
-
-TTL を短くすることで「access token がすぐに期限切れになる状態」を作る。BFF には refresh が実装済みなので、この状態で Step 3 に進む。
-
-補足: refresh が実装されていない場合、1 分後に `/api/me` を開くと Backend API が `401` を返し、BFF がエラーをそのまま表示してしまう。今回はそれを自動で回避する実装を確認するのが目的。
-
-------
-
-## Step 3: refresh による自動更新を確認する
-
-access token の TTL を短く設定した状態で、refresh が自動で動くことを確認する。
+### 操作手順
 
 1. `http://localhost:8000` で `alice` としてログインする
 2. 1 分（TTL）が経過するまで待つ
@@ -148,7 +168,37 @@ stage=bff_proxy_response ... backend_status=200 ...
 
 ------
 
-## Step 4: Keycloak に Back-Channel Logout URL を設定する
+## Step 4: URL 未設定のまま logout を試み、BFF に届かないことを確認する
+
+Keycloak の Back-Channel Logout URL を設定しないまま session を強制終了し、BFF の session が残り続けることを確認する。
+
+### 操作手順
+
+1. BFF が起動している状態で `alice` でログインする
+2. `http://localhost:8000/api/me` にアクセスし、`200` が返ることを確認する
+3. Keycloak の管理コンソールを開く
+4. 左メニューの **Sessions** を開く
+5. 一覧から `alice` の session を見つけ、**Sign out** をクリックする
+6. `http://localhost:8000/api/me` に再度アクセスする
+
+期待する見え方:
+
+- BFF の session が残ったままになるため、`/api/me` が引き続き `200` を返す
+- BFF のログに back-channel 関連のログが出力されない
+
+判定:
+
+- Keycloak で session を強制終了しても、BFF の session が消えない
+
+補足:
+
+- back-channel logout は Keycloak と BFF の両方の設定が揃って初めて機能する
+- URL が未設定の場合は Keycloak が通知を送らないため、BFF の session はアイドルタイムアウトまで残る
+- この動作を確認したら、次の Step で URL を設定して解決する
+
+------
+
+## Step 5: Keycloak に Back-Channel Logout URL を設定する
 
 Keycloak がセッション終了を BFF に通知できるように、`demo-bff` client に Back-Channel Logout URL を設定する。
 
@@ -174,7 +224,7 @@ Keycloak がセッション終了を BFF に通知できるように、`demo-bff
 
 ------
 
-## Step 5: back-channel logout を体験する
+## Step 6: back-channel logout を体験する
 
 Keycloak の管理コンソールからユーザーの session を強制終了し、BFF の session も同時に無効化されることを確認する。
 
@@ -203,7 +253,7 @@ stage=backchannel_logout_success keycloak_sid=xxx... user=alice
 
 ------
 
-## Step 6: 失敗例を再現する
+## Step 7: 失敗例を再現する
 
 ### 失敗例 1: refresh token が期限切れ
 
@@ -259,37 +309,12 @@ curl -X POST http://localhost:8000/backchannel-logout \
 
 ------
 
-### 失敗例 3: backchannel-logout URL 未設定で logout を試みる
-
-目的:
-
-Keycloak の **Backchannel logout URL** が設定されていない場合、session 強制終了が BFF に通知されないことを確認する。
-
-再現方法:
-
-1. `demo-bff` の Settings で **Backchannel logout URL** を空にして Save する
-2. Keycloak の Sessions から `alice` の session を強制終了する
-3. `http://localhost:8000/api/me` にアクセスする
-
-期待する見え方:
-
-- BFF の session が残ったままになるため、`/api/me` が引き続き `200` を返す
-- BFF のログに back-channel 関連のログが出力されない
-
-確認後、**Backchannel logout URL** を `http://localhost:8000/backchannel-logout` に戻す。
-
-補足:
-
-- back-channel logout は Keycloak と BFF の両方の設定が揃って初めて機能する
-- URL が未設定の場合は Keycloak が通知を送らないため、BFF の session はアイドルタイムアウトまで残る
-
-------
-
 ## まとめ
 
 今回の手順で確認したこと:
 
-- access token には有効期限があり、BFF は refresh token を使って自動更新する仕組みを持った
+- refresh token を持たない SPA では、access token 期限切れで即座に `401` になることを確認した
+- BFF に refresh token を持たせることで、ユーザーを再ログインさせずに自動更新できることを確認した
 - refresh token も期限切れになると session が削除されてログイン画面に戻ることを確認した
 - Keycloak の back-channel logout により、サーバー間で直接セッション無効化が通知されることを体験した
 - logout token の署名検証により、外部から session を不正に削除させることができないことを確認した
