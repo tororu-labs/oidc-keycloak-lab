@@ -202,7 +202,8 @@ span.set_attribute("auth.user.email", result.claims.get("email", ""))
 
 - `auth.user.email` の値が `****` などの形でマスクされている
   - redaction processor の `blocked_values` に email パターンが設定されているため
-- Collector の stdout ログに `redaction processor: 1 value(s) redacted` のような行が出る
+- スパンに `redaction.masked.keys: auth.user.email` と `redaction.masked.count: 1` が属性として付加される
+  - これは `summary: debug` の効果。Jaeger UI の Tags で確認できる
 
 補足:
 

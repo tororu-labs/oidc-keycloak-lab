@@ -114,7 +114,7 @@ processors:
     summary: debug             # 開発環境専用。本番では削除する。
 ~~~
 
-`summary: debug` を有効にすると、Collector の stdout に何件の値がマスクされたかが出力される。本番環境では削除する。
+`summary: debug` を有効にすると、マスクされたキー名と件数が `redaction.masked.keys` / `redaction.masked.count` としてスパン属性に付加される。Jaeger UI の Tags で確認できる。本番環境では削除する。
 
 ------
 
