@@ -134,6 +134,7 @@ def build_verify_access_token(settings: Settings, cache: JwksCache):
                 if span.is_recording():
                     span.set_attribute("auth.user.id", result.claims.get("sub", ""))
                     span.set_attribute("auth.result", "success")
+                    span.set_attribute("auth.user.email", result.claims.get("email", ""))
                 return result.claims
             except BadSignatureError:
                 if attempt == 0:
