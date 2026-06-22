@@ -1,0 +1,29 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # デフォルト設定を使用（タイムアウト: 200ms、最大 512 スパン/バッチ）
+  batch:
+  redaction:
+    allow_all_keys: true
+    blocked_values:
+      # email アドレスをマスクする
+      - "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}"
+    # 開発環境専用: redaction の詳細ログを Collector stdout に出力する。本番では削除する。
+    summary: debug
+
+exporters:
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [redaction, batch]
+      exporters: [otlp]

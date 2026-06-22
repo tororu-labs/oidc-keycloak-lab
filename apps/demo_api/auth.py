@@ -10,6 +10,7 @@ from joserfc import jwt
 from joserfc.errors import BadSignatureError, ExpiredTokenError, JoseError
 from joserfc.jwk import KeySet
 from jwks_cache import JwksCache
+from opentelemetry import trace
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -129,18 +130,34 @@ def build_verify_access_token(settings: Settings, cache: JwksCache):
                     result.claims.get("aud"),
                     extract_roles(result.claims),
                 )
+                span = trace.get_current_span()
+                if span.is_recording():
+                    span.set_attribute("auth.user.id", result.claims.get("sub", ""))
+                    span.set_attribute("auth.result", "success")
                 return result.claims
             except BadSignatureError:
                 if attempt == 0:
                     cache.clear()
                     continue
                 logger.warning("stage=backend_authentication reason=bad_signature")
+                span = trace.get_current_span()
+                if span.is_recording():
+                    span.set_attribute("auth.result", "failure")
+                    span.set_attribute("auth.failure.reason", "invalid_sig")
                 raise unauthorized("Access Token の署名検証に失敗しました。")
             except ExpiredTokenError:
                 logger.warning("stage=backend_authentication reason=expired_token")
+                span = trace.get_current_span()
+                if span.is_recording():
+                    span.set_attribute("auth.result", "failure")
+                    span.set_attribute("auth.failure.reason", "expired")
                 raise unauthorized("Access Token の有効期限が切れています。")
             except JoseError as exc:
                 logger.warning("stage=backend_authentication reason=jose_error detail=%s", str(exc))
+                span = trace.get_current_span()
+                if span.is_recording():
+                    span.set_attribute("auth.result", "failure")
+                    span.set_attribute("auth.failure.reason", "jose_error")
                 raise unauthorized(f"Access Token を検証できませんでした。 detail={exc}")
 
         logger.warning("stage=backend_authentication reason=unknown_verification_error")

@@ -5,6 +5,7 @@ from typing import Any
 from auth import build_require_admin_claims, build_verify_access_token
 from config import load_settings
 from fastapi import Depends, FastAPI
+from telemetry import setup_telemetry
 from fastapi.middleware.cors import CORSMiddleware
 from jwks_cache import JwksCache
 from responses import UTF8JSONResponse, build_admin_response, build_index_response, build_me_response
@@ -13,6 +14,7 @@ from responses import UTF8JSONResponse, build_admin_response, build_index_respon
 settings = load_settings()
 
 app = FastAPI(title="FastAPI Backend API Demo", default_response_class=UTF8JSONResponse)
+setup_telemetry(app)
 
 # SPA（demo-web-spa）からのブラウザ直接アクセスを許可する。
 app.add_middleware(

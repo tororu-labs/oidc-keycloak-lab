@@ -189,3 +189,23 @@ back-channel logout 時に Keycloak が BFF に送る JWT。通常の access tok
 ## RP-initiated logout
 
 ユーザーがアプリ（RP: Relying Party）の「ログアウト」ボタンを押したとき、ブラウザを Keycloak の logout endpoint にリダイレクトして session を終了させる仕組み。back-channel logout と異なり、ブラウザが必要。
+
+## trace
+
+1 つのリクエストが複数のサービスを横断したとき、その一連の処理を 1 つの単位として記録したもの。`trace_id`（128 bit の UUID 形式）で識別する。
+
+## span
+
+trace を構成する個々の処理単位。HTTP リクエスト・外部 API 呼び出しなど、時間的に区切れる処理が 1 つのスパンに対応する。開始時刻・終了時刻・属性（key-value）・ステータスを持つ。
+
+## context propagation
+
+あるサービスのスパンから別サービスのスパンに `trace_id` と `parent_span_id` を引き継ぐ仕組み。HTTP では `traceparent` ヘッダー（W3C Trace Context）として伝搬する。このラボでは `HTTPXClientInstrumentor` が BFF の httpx リクエストに自動付与する。
+
+## OTel Collector
+
+OpenTelemetry のコンポーネント。アプリからトレース・メトリクス・ログを受け取り、変換・フィルタリングしてバックエンド（Jaeger など）に転送する。このラボでは redaction processor を通して PII をマスクしてから Jaeger に送る。
+
+## redaction processor
+
+OTel Collector contrib パッケージのプロセッサー。スパン属性の値に正規表現マッチを行い、一致した値を `****` に置き換える。アプリ側で記録を防げなかった PII を Collector 側でまとめてマスクできる。

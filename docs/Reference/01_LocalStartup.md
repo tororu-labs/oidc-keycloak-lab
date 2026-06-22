@@ -193,6 +193,53 @@ npm run dev
 
 ------
 
+## パターン 4: OTel あり（BFF + Backend API + OTel Collector + Jaeger）
+
+`docs/13` を進めるときの構成である。  
+パターン 2 の起動手順に OTel の環境変数を追加する。
+
+### OTel インフラの起動
+
+~~~zsh
+docker compose -f infra/otel/docker-compose.yml up -d
+~~~
+
+- `http://localhost:16686` を開き、Jaeger UI が表示されることを確認する
+
+### Backend API の起動（OTel あり）
+
+~~~zsh
+source .venv/bin/activate
+export KEYCLOAK_BASE_URL=http://localhost:8080
+export KEYCLOAK_REALM=lab
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+export OTEL_SERVICE_NAME=demo-api
+uvicorn main:app --app-dir apps/demo_api --host 127.0.0.1 --port 8001 --reload
+~~~
+
+### BFF の起動（OTel あり）
+
+~~~zsh
+source .venv/bin/activate
+export KEYCLOAK_BASE_URL=http://localhost:8080
+export KEYCLOAK_REALM=lab
+export OIDC_CLIENT_ID=demo-bff
+export OIDC_CLIENT_SECRET='Keycloakで確認したclient secret'
+export APP_BASE_URL=http://localhost:8000
+export BACKEND_API_BASE_URL=http://localhost:8001
+export SESSION_SECRET="$(./.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+export OTEL_SERVICE_NAME=demo-bff
+uvicorn main:app --app-dir apps/demo_bff --host 127.0.0.1 --port 8000 --reload
+~~~
+
+補足:
+
+- `OTEL_EXPORTER_OTLP_ENDPOINT` を省略すると OTel が無効（no-op）になり、パターン 2 と同じ挙動になる
+- `OTEL_SERVICE_NAME` を省略すると BFF は `demo-bff`、API は `demo-api` がデフォルト値として使われる
+
+------
+
 ## 停止方法
 
 ~~~zsh
@@ -201,6 +248,9 @@ Ctrl+C
 
 # Keycloak
 docker compose -f infra/keycloak/docker-compose.yml down
+
+# OTel Collector + Jaeger
+docker compose -f infra/otel/docker-compose.yml down
 ~~~
 
 ------

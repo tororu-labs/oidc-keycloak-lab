@@ -13,6 +13,8 @@ from backend_api import build_backend_json_response, fetch_backend_api_result
 from config import load_settings
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from opentelemetry import trace
+from telemetry import setup_telemetry
 from session_store import InMemorySessionStore
 from starlette.middleware.sessions import SessionMiddleware
 from views import (
@@ -32,6 +34,7 @@ if settings.keycloak_base_url.startswith("http://") or settings.app_base_url.sta
     os.environ.setdefault("AUTHLIB_INSECURE_TRANSPORT", "1")
 
 app = FastAPI(title="FastAPI OIDC Demo")
+setup_telemetry(app)
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.session_secret,
@@ -170,6 +173,10 @@ async def auth_callback(request: Request):
             exc.error,
             exc.description,
         )
+        span = trace.get_current_span()
+        if span.is_recording():
+            span.set_attribute("auth.result", "failure")
+            span.set_attribute("auth.failure.reason", "oauth_error")
         return render_error_page("OIDC callback エラー", message, 400, error_stage="callback")
     except Exception as exc:  # pragma: no cover - integration failure path
         message = (
@@ -179,6 +186,10 @@ async def auth_callback(request: Request):
             f" detail={exc}"
         )
         logger.warning("stage=bff_token_exchange_error detail=%s", str(exc))
+        span = trace.get_current_span()
+        if span.is_recording():
+            span.set_attribute("auth.result", "failure")
+            span.set_attribute("auth.failure.reason", "token_exchange_error")
         return render_error_page(
             "Token 交換エラー",
             message,
@@ -211,6 +222,10 @@ async def auth_callback(request: Request):
         user["issuer"],
         next_path,
     )
+    span = trace.get_current_span()
+    if span.is_recording():
+        span.set_attribute("auth.user.id", user.get("sub", ""))
+        span.set_attribute("auth.result", "success")
     return RedirectResponse(next_path, status_code=303)
 
 

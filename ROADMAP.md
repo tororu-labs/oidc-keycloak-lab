@@ -51,13 +51,13 @@ docs/                                  docs/Reference/
                              ├──→ 08_PublicClientAndPKCE       ← 新規（Phase 03）
 12_SetupRefreshAndLogout ────┘
 
-13_SetupOTelInstrumentation ─────→ 07_Observability            ← 新規（Phase 05）
+13_SetupOTelInstrumentation ─────→ 09_Observability            ← 新規（Phase 05）
 
 ──── 認証基盤 + 観測性ここまで ────────────────────────────
 
 14_SetupSecurityAuditAgent ──────→ 10_AuditAgentDesign         ← 新規（Phase 06）
 
-15_SetupMCPServer ───────────────→ 09_MCPAuthorizationFlow     ← 新規（Phase 07）
+15_SetupMCPServer ───────────────→ 11_MCPAuthorizationFlow     ← 新規（Phase 07）
 ```
 
 ### Phase 一覧
@@ -69,9 +69,9 @@ docs/                                  docs/Reference/
 | Phase 02 | ハンズオン | 基礎 | `10_SetupJWTEdgeCaseTests.md` | ✅ 完了 |
 | Phase 03 | ハンズオン + Reference | 基礎 | `11_SetupNextJsSPAWithPKCE.md` + `Reference/08_PublicClientAndPKCE.md` | ✅ 完了 |
 | Phase 04 | ハンズオン | 基礎 | `12_SetupRefreshAndLogout.md` | ✅ 完了 |
-| Phase 05 | ハンズオン + Reference | 基礎/観測 | `13_SetupOTelInstrumentation.md` + `Reference/07_Observability.md` | 🔲 未着手 |
+| Phase 05 | ハンズオン + Reference | 基礎/観測 | `13_SetupOTelInstrumentation.md` + `Reference/09_Observability.md` | ✅ 完了 |
 | Phase 06 | ハンズオン + Reference | 応用/AI | `14_SetupSecurityAuditAgent.md` + `Reference/10_AuditAgentDesign.md` | 🔲 未着手 |
-| Phase 07 | ハンズオン + Reference | 応用/AI | `15_SetupMCPServer.md` + `Reference/09_MCPAuthorizationFlow.md` | 🔲 未着手 |
+| Phase 07 | ハンズオン + Reference | 応用/AI | `15_SetupMCPServer.md` + `Reference/11_MCPAuthorizationFlow.md` | 🔲 未着手 |
 
 ---
 
