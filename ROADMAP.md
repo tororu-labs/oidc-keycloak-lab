@@ -1,8 +1,8 @@
 # iam-lab-study ROADMAP
 
-> 作成日: 2026-05-17（v2 改訂日: 2026-06-01）
+> 作成日: 2026-05-17（v2 改訂日: 2026-06-23）
 > 目的: docs/ と docs/Reference/ の追加計画を、フェーズ単位で着手・完了判定できる形に整理する
-> 使い方: Claude Code に「Phase NN を実装してほしい」と指示する。1フェーズ単位で進め、完了判定を満たしてから次へ移る。
+> 使い方: Claude Code に「ROADMAP の Phase XX を実装してほしい」と指示する。1フェーズ単位で進め、完了判定を満たしてから次へ移る。
 
 ---
 
@@ -10,6 +10,7 @@
 
 - 各 Phase は **1つのハンズオン docs と 0〜1つの座学 Reference** で構成される
 - Phase は **依存関係順** に並んでいる。原則として前の Phase の完了判定を満たしてから次へ進む
+- ポートフォリオ優先度（🔴/🟡/🟢）を参考に、優先度の高い Phase を先に進める
 - 各 Phase には以下を記載する
   - **学ぶ動機**: なぜこの Phase が必要か
   - **実装すると何が分かるか**: 実装を通じて獲得する理解
@@ -17,6 +18,60 @@
   - **主な扱う内容**: 中で扱うトピックの一覧
   - **想定する失敗例**: 学習価値の高い失敗ケース
   - **完了判定**: この Phase を「完了」と見なす条件
+
+---
+
+## 現在地（2026-06-23 時点）
+
+実ファイルの存在確認に基づく完了状態。
+
+| Phase | 内容 | 状態 |
+|-------|------|------|
+| Phase 00 | Reference 切り出し | ✅ 完了 |
+| Phase 01 | Public Readiness | ⚠️ 部分完了 |
+| Phase 02 | Quality Baseline（pytest + CI） | ⚠️ 部分完了 |
+| Phase 03 | JWT Edge Case Tests | ✅ 完了 |
+| Phase 04 | Client Scope & Mapper | ✅ 完了 |
+| Phase 05 | Client Role vs Realm Role | 🔲 未着手 |
+| Phase 06 | Session / Token Lifetime | 🔲 未着手 |
+| Phase 07 | BFF Cookie Security | 🔲 未着手 |
+| Phase 08 | Refresh Token & Back-channel Logout | ✅ 完了 |
+| Phase 09 | Keycloak Config as Code | 🔲 未着手 |
+| Phase 10 | SSE 認証 | 🔲 未着手 |
+| Phase 11 | WebSocket 認証 | 🔲 未着手 |
+| Phase 12 | OTel | ✅ 完了 |
+| Phase 13 | Security Audit Agent | 🔲 未着手 |
+| Phase 14 | SPA + PKCE（Next.js） | ✅ 完了 |
+| Phase 15 | MCP | 🔲 未着手 |
+| Phase 16 | Client Credentials（M2M） | 🔲 未着手 |
+
+**⚠️ 部分完了の内訳:**
+- Phase 01: `.github/workflows/ci.yml` はあり。`LICENSE`・`.env.example` はなし。
+- Phase 02: `apps/demo_api/tests/test_auth.py` と `ci.yml` はあり。lint 設定は未確認。
+
+---
+
+## Phase 一覧と優先度
+
+| Phase | 内容 | ポートフォリオ優先度 | 状態 |
+|-------|------|-----------------|------|
+| Phase 00 | Reference 切り出し | — | ✅ 完了 |
+| Phase 01 | Public Readiness | 🔴 高（公開の前提） | ⚠️ 部分完了 |
+| Phase 02 | Quality Baseline | 🔴 高（最初に見られる） | ⚠️ 部分完了 |
+| Phase 03 | JWT Edge Case Tests | 🔴 高（セキュリティ専門性） | ✅ 完了 |
+| Phase 04 | Client Scope & Mapper | 🟡 中 | ✅ 完了 |
+| Phase 05 | Client Role vs Realm Role | 🟡 中（IAM 設計の深さ） | 🔲 未着手 |
+| Phase 06 | Session / Token Lifetime | 🟡 中 | 🔲 未着手 |
+| Phase 07 | BFF Cookie Security | 🟡 中（Web セキュリティ基礎） | 🔲 未着手 |
+| Phase 08 | Refresh Token & Back-channel Logout | 🟡 中 | ✅ 完了 |
+| Phase 09 | Keycloak Config as Code | 🟢 低〜中（再現性） | 🔲 未着手 |
+| Phase 10 | SSE 認証 | 🟢 低（応用） | 🔲 未着手 |
+| Phase 11 | WebSocket 認証 | 🟢 低（応用） | 🔲 未着手 |
+| Phase 12 | OTel | 🟡 中（観測性） | ✅ 完了 |
+| Phase 13 | Security Audit Agent | 🔴 高（差別化） | 🔲 未着手 |
+| Phase 14 | SPA + PKCE（Next.js） | 🟡 中（フルスタック） | ✅ 完了 |
+| Phase 15 | MCP | 🔴 高（AI × 認証） | 🔲 未着手 |
+| Phase 16 | Client Credentials（M2M） | 🟡 中（実務スキル） | 🔲 未着手 |
 
 ---
 
@@ -30,488 +85,471 @@ docs/                                  docs/Reference/
                                        00_Glossary.md          ← 全体共通
                                        01_LocalStartup.md      ← 全体共通
 
-03_SetupDocker-Keycloak ─────┐
-04_SetupKeycloak ────────────┤
-05_SetupFastAPI-OIDCLogin ───┼──→ 02_AuthFlowArchitecture
-06_SetupFastAPI-BackendAPI ──┘     04_ClientAndTokenRoles
-
-07_SetupTokenValidation ─────────→ 03_Troubleshooting
-
-──── ここまで既存 ─────────────────────────────────────────
-
+── 完了済み ──────────────────────────────────────────────────────
 08_SetupAudienceValidation ──┐
-                             ├──→ 05_TokenClaimsAndValidation  ← ✅ Phase 00
-09_SetupClientScopeAndMapper ┘     06_ClientScopeAndMapperTypes ← ✅ Phase 01
-
-10_SetupJWTEdgeCaseTests ────────→ 05_TokenClaimsAndValidation  ← 再利用（Phase 02）
-
-──── 認証/認可の基礎ここまで ──────────────────────────────
+09_SetupClientScopeAndMapper ┼──→ 05_TokenClaimsAndValidation  ← ✅ Phase 00, 03
+10_SetupJWTEdgeCaseTests ────┘    06_ClientScopeAndMapperTypes ← ✅ Phase 04
 
 11_SetupNextJsSPAWithPKCE ───┐
-                             ├──→ 08_PublicClientAndPKCE       ← 新規（Phase 03）
-12_SetupRefreshAndLogout ────┘
+12_SetupRefreshAndLogout ────┴──→ 08_PublicClientAndPKCE       ← ✅ Phase 08, 14
 
-13_SetupOTelInstrumentation ─────→ 09_Observability            ← 新規（Phase 05）
+13_SetupOTelInstrumentation ─────→ 09_Observability            ← ✅ Phase 12 完了
 
-──── 認証基盤 + 観測性ここまで ────────────────────────────
+── 未着手 ────────────────────────────────────────────────────────
+Phase 05 Client Role ────────────→ 06_ClientScopeAndMapperTypes（追記）
 
-14_SetupSecurityAuditAgent ──────→ 10_AuditAgentDesign         ← 新規（Phase 06）
+Phase 13 Security Audit Agent ──→ 10_AuditAgentDesign          ← 新規
 
-15_SetupMCPServer ───────────────→ 11_MCPAuthorizationFlow     ← 新規（Phase 07）
+Phase 15 MCP ────────────────────→ 11_MCPAuthorizationFlow     ← 新規
+
+Phase 16 M2M 認証 ───────────────→ 12_MachineToMachineAuth     ← 新規
 ```
 
-### Phase 一覧
+---
 
-| Phase | 種別 | 領域 | 対象ファイル | ステータス |
-|-------|------|------|-------------|----------|
-| Phase 00 | Reference 切り出し | 基礎 | `Reference/05_TokenClaimsAndValidation.md` | ✅ 完了 |
-| Phase 01 | ハンズオン + Reference | 基礎 | `09_SetupClientScopeAndMapper.md` + `Reference/06_ClientScopeAndMapperTypes.md` | ✅ 完了 |
-| Phase 02 | ハンズオン | 基礎 | `10_SetupJWTEdgeCaseTests.md` | ✅ 完了 |
-| Phase 03 | ハンズオン + Reference | 基礎 | `11_SetupNextJsSPAWithPKCE.md` + `Reference/08_PublicClientAndPKCE.md` | ✅ 完了 |
-| Phase 04 | ハンズオン | 基礎 | `12_SetupRefreshAndLogout.md` | ✅ 完了 |
-| Phase 05 | ハンズオン + Reference | 基礎/観測 | `13_SetupOTelInstrumentation.md` + `Reference/09_Observability.md` | ✅ 完了 |
-| Phase 06 | ハンズオン + Reference | 応用/AI | `14_SetupSecurityAuditAgent.md` + `Reference/10_AuditAgentDesign.md` | 🔲 未着手 |
-| Phase 07 | ハンズオン + Reference | 応用/AI | `15_SetupMCPServer.md` + `Reference/11_MCPAuthorizationFlow.md` | 🔲 未着手 |
+## 各 Phase の詳細
 
 ---
 
-## Phase 00: 既存 docs/08 の座学を Reference に切り出す ✅ 完了
+### Phase 00: 既存 docs/08 の座学を Reference に切り出す ✅ 完了
 
-### 学ぶ動機
-
-`docs/08_SetupAudienceValidation.md` で扱った内容には、ハンズオンの手順と座学的な解説（claim の意味、検証の順序、Authlib の仕組みなど）が混ざっている。これを Reference に切り出すことで、後の Phase 02（JWT エッジケーステスト）でも再利用できる座学資産になる。
-
-### 実装すると何が分かるか
-
-- claim 検証は「署名 → `iss` → `exp` → `aud`」の順序で並べると、各検証の役割が明確になる
-- `aud` と `azp` の使い分けは、token 設計の中核的なポイント
-- Authlib の `claims_options` が裏で何をしているかを言語化できる
-
-### 作成するファイル
-
-- 新規: `docs/Reference/05_TokenClaimsAndValidation.md`
-
-### 主な扱う内容
-
-- token に含まれる代表的な claim（`iss` / `sub` / `aud` / `azp` / `exp` / `iat` / `realm_access.roles`）の意味と例
-- Backend API が検証すべき claim の順序（署名 → `iss` → `exp` → `aud`）と各検証の役割
-- `aud` と `azp` の使い分け
-  - `aud`: token を受け取るべきサービス（誰向け）
-  - `azp`: token を要求した client（誰が要求したか）
-- Authlib の `claims_options` の仕組み
-  - `essential` と `value` の意味
-  - 例外型（`InvalidClaimError`, `ExpiredTokenError`, `InvalidSignatureError` など）の対応表
-
-### 完了判定
-
-- `docs/Reference/05_TokenClaimsAndValidation.md` が作成されている
-- 既存の `docs/08_SetupAudienceValidation.md` から、新 Reference へのリンクが追加されている
-- `docs/Reference/04_ClientAndTokenRoles.md` の「Access Token で API が見ているもの」セクションから、新 Reference への参照リンクが追加されている
+**作成済みファイル:** `docs/Reference/05_TokenClaimsAndValidation.md`
 
 ---
 
-## Phase 01: Client Scope と Mapper の体系整理 ✅ 完了
+### Phase 01: Public Readiness ⚠️ 部分完了
 
-### 学ぶ動機
+**目的:** GitHub repository を public 化しても安全な状態に整える。
 
-`docs/08` で Audience Mapper を1つ追加して、token の中身を Keycloak 側で操作できることを体験した。しかし mapper には他にも多数あり、client scope という箱の仕組みもある。
+**残作業:**
+- `LICENSE` を追加する
+- `.env.example` を整備する（`apps/demo_api/.env.example`、`apps/demo_bff/.env.example` など）
+- README を刷新する（Architecture / Features / Quick Start / Security Notes / Roadmap を含む）
+- `notes/` と `scratch/` の公開可否を整理する
+- ドキュメント内の絶対パスリンクを相対パスに修正する
+- `infra/keycloak/.env` が git 追跡されていないか確認する（`git ls-files infra/keycloak/.env`）
+- `apps/demo_api/auth.py` のコメントアウト旧コードを削除する
+- production ready ではないことを README に明記する
 
-実務では「token に独自の claim を入れたい」「scope と role の違い」「default scope と optional scope の使い分け」が頻繁に問われる。この Phase でその知識を体系化する。
+**完了済み:**
+- `.github/workflows/ci.yml` が存在する
 
-### 実装すると何が分かるか
-
-- dedicated scope（client 専用）と shared scope（複数 client で使い回し）の違い
-- default scope（黙って付く）と optional scope（明示要求が必要）の使い分け
-- 各種 mapper の役割と使いどころ
-- scope ベースの認可の入り口
-
-### 作成するファイル
-
-- 新規: `docs/09_SetupClientScopeAndMapper.md`
-- 新規: `docs/Reference/06_ClientScopeAndMapperTypes.md`
-
-### 主な扱う内容（ハンズオン）
-
-- 共通の shared client scope を作成して `demo-bff` に割り当てる
-- User Property Mapper を追加して、token に独自 claim を出す
-- Hardcoded Claim Mapper で固定値を埋めてみる
-- Role Name Mapper で role 名を変換する
-- optional scope を作成し、scope パラメータで明示要求する流れを確認する
-- Token Evaluate で各 mapper の効果を確認する
-
-### 主な扱う内容（Reference）
-
-- client scope の正体（mapper をまとめる箱）
-- dedicated scope vs shared scope の違いと再利用パターン
-- default scope vs optional scope の動作の違い
-- 主要な mapper 種別カタログ（Audience / User Property / Hardcoded Claim / Role Name / Group Membership など）
-- OAuth2 の scope と Keycloak の role の関係
-
-### 想定する失敗例
-
-- scope assign 忘れで claim が出ない
-- optional scope を `scope` パラメータで要求しなかった場合の挙動
-- shared scope と dedicated scope を取り違えて他の client にも影響が出るケース
-
-### 完了判定
-
-- `docs/09_SetupClientScopeAndMapper.md` が作成され、既存の docs と同じ形式（ここでのゴール / この手順の流れ / 実施手順 / 完了判定 / まとめ）に従っている
-- `docs/Reference/06_ClientScopeAndMapperTypes.md` が作成されている
-- ハンズオンを実行すると、Token Evaluate で追加した mapper の効果が確認できる
-- 失敗例を再現すると、期待した挙動になることが確認できる
+**完了判定:**
+- `LICENSE` が追加されている
+- `.env.example` が各アプリに存在する
+- README に Architecture / Quick Start / Security Notes が含まれている
+- `git ls-files` で `.env` や secret ファイルが追跡されていないことを確認できる
 
 ---
 
-## Phase 02: JWT エッジケーステスト
+### Phase 02: Quality Baseline ⚠️ 部分完了
 
-### 学ぶ動機
+**目的:** テスト・lint が自動で実行される品質基盤を作る。
 
-`docs/08` までで実装した JWT 検証ロジック（署名・`iss`・`exp`・`aud`）は、正常系と数個の失敗例でしか検証されていない。`alg=none` 攻撃や `kid` 不正のような攻撃シナリオは、ブラウザ操作では再現できない。
+**残作業:**
+- ruff などの lint / format 設定を整備する
+- CI で lint が実行されているか確認し、なければ追加する
+- BFF / Backend API の import test を追加する（起動確認レベルの最低限テスト）
+- 未ログイン時 redirect などの基本 route test を追加する
 
-pytest で異常系を意図的に作って検証することで、「実装した」だけでなく「異常系も押さえた」と説明できる状態を作る。
+**完了済み:**
+- `apps/demo_api/tests/test_auth.py` が存在する（JWT 検証テスト）
+- `.github/workflows/ci.yml` が存在する
 
-### 実装すると何が分かるか
-
-- 「ライブラリが暗黙で処理してくれる部分」と「自分のコードが責任を持つ部分」の境界
-- JWKS のモック化を通じた Backend API と Keycloak の通信の仕組み
-- Authlib の例外型を区別することで得られる、失敗理由の特定能力
-
-### 作成するファイル
-
-- 新規: `docs/10_SetupJWTEdgeCaseTests.md`
-- 参照: `docs/Reference/05_TokenClaimsAndValidation.md`（Phase 00 で作成済み）
-
-### 主な扱う内容
-
-- pytest と pytest-asyncio のセットアップ
-- JWKS のモック化（テスト用の RSA 鍵ペア生成と fixture 化）
-- テストケースの設計
-  - 正常系: 正しい token が通る
-  - 署名改ざん: payload を書き換えた token が弾かれる
-  - `alg=none` 攻撃: アルゴリズムを `none` にした token が弾かれる
-  - `kid` 不正: 存在しない `kid` を指定した token が弾かれる
-  - `exp` 境界: 期限切れ直前 / 直後の挙動
-  - `exp` 欠落: `exp` claim が存在しない token の扱い
-  - `aud` 不一致: 別 audience の token が弾かれる
-  - `iss` 不一致: 別 issuer の token が弾かれる
-- Authlib の例外型の区別とログ出力への反映
-
-### 想定する失敗例
-
-- テスト用の鍵ペアを毎回生成すると遅い → fixture 化で解決
-- Authlib の例外型を取り違えて、特定の失敗を捕捉できない
-- JWKS モックの cache TTL を考慮しないテストで flaky になる
-
-### 完了判定
-
-- `docs/10_SetupJWTEdgeCaseTests.md` が作成されている
-- `apps/demo_api/tests/test_auth.py` が作成され、上記の全テストケースが通る
-- `pytest` 実行で全テストが green になる
-- 既存の `auth.py` のロジックに変更を加えた場合、関連テストが失敗するように設計されている
+**完了判定:**
+- `pytest` が CI で自動実行される
+- lint / format が CI で自動実行される
+- PR 時に CI が走り、失敗時にマージをブロックできる状態になっている
 
 ---
 
-## Phase 03: Next.js SPA + PKCE 構成
+### Phase 03: JWT Edge Case Tests ✅ 完了
 
-### 学ぶ動機
+**作成済みファイル:** `docs/10_SetupJWTEdgeCaseTests.md`、`apps/demo_api/tests/test_auth.py`
 
-これまで BFF 構成（confidential client）しか触っていなかった。SPA + PKCE（public client）の構成も実務では非常に多い。
-
-「`client_secret` を持てない世界」での認証を体験し、トークン保管場所のトレードオフを実装で理解する。BFF 構成と SPA 構成を **両方** 持つことが、認証/認可の基礎を「完全に固めた」と言える条件になる。
-
-### 実装すると何が分かるか
-
-- public client が secret を持てない理由と PKCE の必要性
-- トークン保管場所のトレードオフ（localStorage / Cookie / in-memory）
-- BFF 構成と SPA 構成の対比
-
-### 作成するファイル
-
-- 新規: `docs/11_SetupNextJsSPAWithPKCE.md`
-- 新規: `docs/Reference/08_PublicClientAndPKCE.md`
-- 新規: `apps/demo_web_spa/` 配下の実装ファイル
-
-### 主な扱う内容（ハンズオン）
-
-- `apps/demo_web_spa/` の新規作成（Next.js）
-- Keycloak に SPA 用の public client を追加（`demo-web-spa`）
-- PKCE 実装（`code_verifier` と `code_challenge` の生成）
-- ブラウザでのトークン保管（in-memory）
-- Backend API への直接アクセス（BFF を経由しない）
-- BFF 構成との挙動比較
-
-### 主な扱う内容（Reference の前半部分）
-
-- public client と confidential client の違い
-- PKCE の仕組み（`code_verifier` と `code_challenge` の関係）
-- トークン保管場所の選択肢とトレードオフ
-
-### 想定する失敗例
-
-- `code_challenge_method` の不一致
-- localStorage に token を置いた場合の XSS リスク
-- CORS 設定漏れで Backend API にアクセスできない
-
-### 完了判定
-
-- `docs/11_SetupNextJsSPAWithPKCE.md` が作成されている
-- `docs/Reference/08_PublicClientAndPKCE.md` が作成されている（Phase 04 で更新される前提）
-- `apps/demo_web_spa/` が起動し、`http://localhost:3000` でアクセスできる
-- Keycloak に `demo-web-spa` public client が登録されている
-- ブラウザから PKCE フローでログインでき、Backend API を呼び出せる
-- BFF 構成と SPA 構成の挙動の違いを Reference で説明できる
+**扱った内容:** 署名改ざん・`alg=none` 攻撃・`kid` 不正・`exp` 境界・`aud` 不一致・`iss` 不一致の異常系テスト
 
 ---
 
-## Phase 04: Refresh Token と Back-channel Logout
+### Phase 04: Client Scope と Mapper の体系整理 ✅ 完了
 
-### 学ぶ動機
-
-これまで access token が切れたあとの挙動は触っていなかった。実務では「再ログイン地獄を避けつつセキュリティを保つ」のが大きな課題。
-
-back-channel logout は SSO 環境で必須の機能で、「あるアプリでログアウトしたら他のアプリでも自動でログアウト」を実現する。
-
-Phase 03 で SPA を追加した直後にこの Phase を置くことで、「SPA だと refresh token を localStorage に置けない → BFF が必要」というオチが自然に体感できる。
-
-### 実装すると何が分かるか
-
-- refresh token の保管責任（SPA では localStorage に置けないので BFF が必要）
-- 非同期セキュリティイベントの設計（back-channel logout は HTTP 通知）
-- logout token の検証（`events` claim を含む JWT 検証）
-
-### 作成するファイル
-
-- 新規: `docs/12_SetupRefreshAndLogout.md`
-- 更新: `docs/Reference/08_PublicClientAndPKCE.md`（Phase 03 で作成したものに、refresh / logout 関連の章を追加）
-
-### 主な扱う内容（ハンズオン）
-
-- refresh token grant の実装（BFF 側）
-- BFF session 内での refresh token 保管
-- access token 期限切れ検知時の自動 refresh
-- back-channel logout endpoint の実装
-- logout token の検証（`iss` / `aud` / `events` claim）
-- Keycloak の Back-Channel Logout URL 設定
-
-### 主な扱う内容（Reference 追加部分）
-
-- Refresh token のライフサイクルと保管責任
-- Back-channel logout の動作と RP-initiated との対比
-- logout token の検証観点
-
-### 想定する失敗例
-
-- refresh token を localStorage に置いた場合のリスク
-- logout token の `events` claim 検証漏れ
-- session 削除タイミングの race condition
-
-### 完了判定
-
-- `docs/12_SetupRefreshAndLogout.md` が作成されている
-- `docs/Reference/08_PublicClientAndPKCE.md` に refresh / logout 関連の章が追加されている
-- access token 期限切れ後に、自動で refresh されてアクセスが継続する
-- Keycloak の管理コンソールから user の session を terminate すると、back-channel 経由で BFF の session が即座に無効化される
-- logout token の改ざんを試すと、検証で弾かれることを確認できる
+**作成済みファイル:** `docs/09_SetupClientScopeAndMapper.md`、`docs/Reference/06_ClientScopeAndMapperTypes.md`
 
 ---
 
-## Phase 05: OpenTelemetry による認証フロー可視化
+### Phase 05: Client Role vs Realm Role 🔲 未着手
 
-### 学ぶ動機
+**学ぶ動機:**
+Phase 04 で Mapper の設定を学んだ後、「どの role を使うべきか」という設計判断が問われる。
+`realm_access.roles` と `resource_access.<client_id>.roles` の違いを実装で確認し、設計観点として整理する。
+`Reference/04_ClientAndTokenRoles.md` で「今後の拡張ポイント」として先送りされていた内容を回収する。
 
-これまで失敗の切り分けは人力でログを横断的に追うしかなかった。マイクロサービス環境では分散トレーシングが必須になる。認証フローは「どの段階で落ちたか」を可視化したいケースが多く、OTel と相性が良い。
+**実装すると何が分かるか:**
+- `realm_access.roles` と `resource_access.<client_id>.roles` の token 上の位置の違い
+- 「全 client 共通 → realm role」「サービス固有 → client role」という設計判断基準
 
-ここまでで認証/認可の機能側（BFF + SPA + refresh + logout）が完成しているため、観測性を加えることで「**動く認証基盤** + **観測できる認証基盤**」という基礎パッケージが完成する。
+**作成するファイル:**
+- 新規: `docs/14_SetupClientRoleDesign.md`
+- 更新: `docs/Reference/06_ClientScopeAndMapperTypes.md`（client role の節を追加）
 
-「観測性 vs プライバシー」のトレードオフを設計する経験を積む。
+**主な扱う内容:**
+- Keycloak で `demo-api` の client role（`api-reader` / `api-writer`）を作成する
+- alice / bob に client role を割り当てる
+- Token Evaluate で `resource_access.demo-api.roles` に現れることを確認する
+- realm role（`viewer` / `admin`）と client role の token 上の位置を並べて比較する
+- 設計判断基準を Reference に整理する
 
-### 実装すると何が分かるか
+**想定する失敗例:**
+- client role を設定したのに token に現れない → mapper の設定漏れ
+- `realm_access.roles` を見る実装のまま client role を設定しても Backend API の認可が変わらない
 
-- スパン属性の設計（何を記録し、何を記録すべきでないか）
-- redaction processor による PII フィルタの設計
-- context propagation の仕組みと、ミスったときの挙動
-
-### 作成するファイル
-
-- 新規: `docs/13_SetupOTelInstrumentation.md`
-- 新規: `docs/Reference/07_Observability.md`
-
-### 主な扱う内容（ハンズオン）
-
-- `opentelemetry-instrumentation-fastapi` の導入（BFF と Backend API 両方）
-- カスタムスパン属性の設定
-  - `auth.user.id`（`sub` claim）
-  - `auth.result`（success / failure）
-  - `auth.failure.reason`（expired / invalid_sig / aud_mismatch など）
-- OTel Collector のセットアップ（Docker Compose に追加）
-- redaction processor の設定で PII（`email`、`sub` の一部など）をマスク
-- Jaeger または Tempo での可視化
-
-### 主な扱う内容（Reference）
-
-- 分散トレーシングの基本概念（trace / span / context propagation）
-- 観測性とプライバシーのトレードオフ
-- スパン属性の設計指針（何を記録するか、何をマスクするか）
-- SIEM 連携を視野に入れた設計
-
-### 想定する失敗例
-
-- PII（`email` や `sub`）がスパン属性に漏れる
-- redaction processor の設定ミスで本来マスクすべき値が出力される
-- context propagation 漏れでトレースが繋がらない（BFF と Backend API が別々のトレースになる）
-
-### 完了判定
-
-- `docs/13_SetupOTelInstrumentation.md` が作成されている
-- `docs/Reference/07_Observability.md` が作成されている
-- OTel Collector が起動し、BFF と Backend API のトレースが連携される
-- Jaeger / Tempo UI で 1 つのリクエストが BFF → Backend API として 1 本のトレースで見える
-- redaction が効いて、PII がスパン属性に出力されないことを確認できる
+**完了判定:**
+- `docs/14_SetupClientRoleDesign.md` が作成されている
+- Token Evaluate で `resource_access.demo-api.roles` に client role が表示される
+- `Reference/06` に realm role vs client role の設計判断の節が追加されている
 
 ---
 
-## Phase 06: セキュリティ監査エージェント
+### Phase 06: Session / Token Lifetime 🔲 未着手
 
-### 学ぶ動機
+**学ぶ動機:**
+BFF session と Access Token の寿命の違いを整理し、現在の実装で起こり得る認可結果の食い違いを扱う。
+role 変更後に session 内の古い role が残るケースなど、BFF 構成の便利さだけでなく落とし穴を理解する。
 
-Phase 05 までで「認証システムを作る側」「観測する側」の基礎は完成した。この Phase では「**監査する側**」に回り、ログとイベントから不審なパターンを検出する LLM エージェントを実装する。
+**実装すると何が分かるか:**
+- BFF session TTL と Access Token `exp` の独立した管理
+- role 変更後の session 内 role の問題と対処方針
+- 再ログインさせる設計と refresh する設計のトレードオフ
 
-Phase 05 で OTel による可視化を済ませているため、エージェントは構造化された認証ログを入力にできる。観測基盤の上に AI による分析層を載せる設計が、転職市場での希少価値が高い組み合わせになる。
+**作成するファイル:**
+- 新規: `docs/15_SetupSessionAndTokenLifetime.md`
 
-現職のセキュリティ運用経験（ログ収集と分析）と LLM エージェント実装を組み合わせた経験は、面接で強くアピールできる素材になる。
+**主な扱う内容:**
+- BFF session TTL の設定と確認
+- Access Token `exp` との対比
+- BFF の `/admin` と Backend API の `/api/admin-data` の認可タイミングの違い
+- role 変更後の挙動確認と対処方針
+- token 期限切れ時の UX
 
-### 実装すると何が分かるか
+**完了判定:**
+- `docs/15_SetupSessionAndTokenLifetime.md` が作成されている
+- session TTL と Access Token `exp` の違いをブラウザと Keycloak コンソールで確認できる
+- role 変更後の動作が期待通りになっている
 
-- LLM エージェントの「ツール」設計とハルシネーション抑制の system prompt
-- 決定的なコード（パターン検出）と LLM（要約・レポート生成）の役割分担
+---
+
+### Phase 07: BFF Cookie Security 🔲 未着手
+
+**学ぶ動機:**
+Cookie session を使う BFF 構成で必要になる Web security の基礎を整理する。
+CSRF・SameSite・HttpOnly・Secure の設定が揃っていないと、認証が正しく動いていても攻撃経路が残る。
+
+**実装すると何が分かるか:**
+- Cookie session における主要な防御属性の意味と設定方法
+- CSRF 対策の実装パターン
+- local 環境と production 環境での設定差分
+
+**作成するファイル:**
+- 新規: `docs/16_SetupBFFCookieSecurity.md`
+
+**主な扱う内容:**
+- CSRF 対策の実装（logout endpoint 含む）
+- `SameSite` / `HttpOnly` / `Secure` の設定確認と意味
+- セッション Cookie 名のデフォルト変更
+- local development と production の設定差分の整理
+
+**完了判定:**
+- `docs/16_SetupBFFCookieSecurity.md` が作成されている
+- CSRF トークンが logout endpoint で検証される
+- Cookie が `HttpOnly`・`SameSite=Lax`（または Strict）で設定されている
+
+---
+
+### Phase 08: Refresh Token と Back-channel Logout ✅ 完了
+
+**作成済みファイル:** `docs/12_SetupRefreshAndLogout.md`、`docs/Reference/08_PublicClientAndPKCE.md`（refresh / logout 関連章を追加済み）
+
+---
+
+### Phase 09: Keycloak Configuration as Code 🔲 未着手
+
+**学ぶ動機:**
+GUI 手順だけに依存した設定は再現性がない。他の人が手元で再現でき、設定を壊したときに復旧できるリポジトリにする。
+
+**実装すると何が分かるか:**
+- `kcadm.sh` を使った Keycloak 設定の自動化
+- realm export / import による設定の保存と復元
+
+**作成するファイル:**
+- 新規: `docs/17_SetupKeycloakAsCode.md`
+- 新規: `infra/keycloak/setup.sh`（bootstrap スクリプト）
+
+**主な扱う内容:**
+- `kcadm.sh` による realm / user / role / client / mapper の作成
+- realm export / import
+- local bootstrap script の整備
+- 設定を壊したときの復旧手順
+
+**完了判定:**
+- `docs/17_SetupKeycloakAsCode.md` が作成されている
+- `infra/keycloak/setup.sh` を実行すると、Keycloak の初期設定が再現できる
+- スクリプトを実行した状態で既存のハンズオン手順が動作する
+
+---
+
+### Phase 10: SSE 認証 🔲 未着手
+
+**学ぶ動機:**
+SSE はブラウザからサーバーへの長寿命な一方向接続。接続中に token が切れたり session が無効化された場合の認証状態管理は、通常の HTTP request とは異なる問題を持つ。
+
+**実装すると何が分かるか:**
+- Cookie session 付きの SSE 接続の実装
+- 接続中の session 無効化に対する応答設計
+
+**作成するファイル:**
+- 新規: `docs/18_SetupSSEAuth.md`
+
+**主な扱う内容:**
+- BFF に `/events` SSE endpoint を追加
+- Cookie session 付きの SSE 接続
+- session expired 通知・logout 通知の実装
+- back-channel logout と連動したブラウザへのリアルタイム通知
+- 接続中に session が無効化された場合の扱い
+
+**完了判定:**
+- `docs/18_SetupSSEAuth.md` が作成されている
+- BFF logout 時に SSE 経由でブラウザへ通知が届く
+- session が無効化されたとき、SSE 接続が適切に終了する
+
+---
+
+### Phase 11: WebSocket 認証 🔲 未着手
+
+**学ぶ動機:**
+WebSocket は双方向の長寿命接続。handshake 時の認証と、接続中の role 変更・token 切れの扱いは SSE とは異なる論点を持つ。
+
+**実装すると何が分かるか:**
+- WebSocket handshake 時の認証方式の選択肢
+- 接続中の token expiry / role change への対応方針
+
+**作成するファイル:**
+- 新規: `docs/19_SetupWebSocketAuth.md`
+
+**主な扱う内容:**
+- WebSocket handshake 時の認証（Cookie session vs Bearer token）
+- 接続中の token expiry への対応
+- logout / role change 時の切断処理
+- origin check
+- message-level authorization
+- SSE との違いの整理
+
+**完了判定:**
+- `docs/19_SetupWebSocketAuth.md` が作成されている
+- 未認証の接続がハンドシェイク時に拒否される
+- 接続中に session が無効化されると切断される
+
+---
+
+### Phase 12: OpenTelemetry による認証フロー可視化 ✅ 完了
+
+**作成済みファイル:** `docs/13_SetupOTelInstrumentation.md`、`docs/Reference/09_Observability.md`
+
+**扱った内容:** BFF / Backend API への OTel 計装・カスタムスパン属性（`auth.user.id`・`auth.result`・`auth.failure.reason`・`auth.user.email`）・redaction processor による PII マスク・Jaeger での可視化
+
+---
+
+### Phase 13: セキュリティ監査エージェント 🔲 未着手
+
+**学ぶ動機:**
+Phase 12 で OTel による可視化を済ませているため、エージェントは構造化された認証ログを入力にできる。
+現職のセキュリティ運用経験（ログ収集と分析）と LLM エージェント実装を組み合わせることで、転職市場での差別化ポイントになる。
+
+実装は **Step 1（パイプライン固定）→ Step 2（LLM が調査判断）** の 2 段階で積み上げる。先にツールが正しく動くことを確認してから、エージェントループに切り替えることで、デバッグの切り分けがしやすくなる。
+
+**実装すると何が分かるか:**
+- ツール設計の柔軟性の重要性（Step 2 で作り直さないためのインターフェース設計）
+- LLM に何を判断させ、何をコードで制御するかの境界
+- エージェントループの制御（max_iterations、終了条件）
+- ハルシネーション抑制の system prompt 設計
 - Keycloak Admin REST API を使った運用自動化の入り口
 
-### 作成するファイル
-
-- 新規: `docs/14_SetupSecurityAuditAgent.md`
+**作成するファイル:**
+- 新規: `docs/20_SetupSecurityAuditAgent.md`
 - 新規: `docs/Reference/10_AuditAgentDesign.md`
-- 新規: `agent/` ディレクトリ配下の実装ファイル
+- 新規: `apps/demo_agent/` 配下の実装ファイル
 
-### 主な扱う内容（ハンズオン）
+**主な扱う内容:**
 
-- `agent/` ディレクトリの作成と依存関係のセットアップ
-- 4ツールの実装
-  - `get_auth_logs`: FastAPI のアクセスログ（or OTel トレースから抽出したログ）を取得
-  - `analyze_pattern`: ブルートフォース・深夜アクセス・権限昇格試行を検出
-  - `get_keycloak_events`: Keycloak Admin REST API からイベントを取得
-  - `generate_report`: Markdown 形式の監査レポートを出力
-- system prompt の設計（「推測で補完しない」「データに存在しない数値を出さない」ルール）
-- エージェントの動作確認（疑似的な攻撃ログを投入して検出できるか）
+Step 1（パイプライン固定でレポートを出す）:
+- 5 ツールの実装（最初から柔軟なインターフェースで設計する）
+  - `search_logs(stage=None, user=None, reason=None, limit=50)`: FastAPI ログを条件で絞り込んで取得
+  - `get_user_events(user_id, event_type=None)`: 対象ユーザーの Keycloak イベントを取得
+  - `get_ip_activity(ip_address)`: 対象 IP の全アクティビティを横断取得
+  - `check_keycloak_admin_events(time_range=None)`: 権限昇格・設定変更イベントを取得
+  - `generate_report(findings)`: Markdown 形式の監査レポートを出力
+- 固定順でツールを呼び出してレポートが生成されることを確認する
 
-### 主な扱う内容（Reference）
+Step 2（LLM に調査判断を委ねる）:
+- エージェントループの実装（LLM がツールを選んで繰り返し呼び出す）
+- system prompt の設計（「推測で補完しない」「疑わしいパターンを見つけたら IP とユーザー両方を調べる」）
+- ループ制御（max_iterations、終了条件）
 
-- LLM エージェントの設計原則（ツール分割、決定的処理と非決定的処理の境界）
-- system prompt の役割（「セキュリティ仕様書」としてのプロンプト）
-- ハルシネーション抑制の具体的なテクニック
-- Keycloak Admin REST API の使い方（service account、event API）
-- 監査の3層（認証ログ / Keycloak イベント / OTel トレース）の関係
+**LLM プロバイダー:** Anthropic API（Claude）を使用する。
 
-### 想定する失敗例
-
+**想定する失敗例:**
+- Step 1 でツールのインターフェースを固定（引数なし）で作ると、Step 2 で作り直しになる
 - 推測でログを補完してしまうハルシネーション → system prompt で抑制
 - Admin API のトークン取得失敗 → service account の権限不足
-- イベント検索クエリの誤り → Keycloak のイベント種別の理解不足
 - LLM に決定的処理（例: 数値しきい値判定）を任せて精度が落ちる
+- ループが止まらない → max_iterations と終了条件の設計漏れ
 
-### 完了判定
+**完了判定:**
 
-- `docs/14_SetupSecurityAuditAgent.md` が作成されている
+Step 1:
+- `apps/demo_agent/` 配下に 5 ツールが実装されている
+- 固定順でツールを呼び出してレポートが生成される
+- レポートに含まれる数値・固有名詞が入力データに実在する（ハルシネーションなし）
+
+Step 2:
+- `docs/20_SetupSecurityAuditAgent.md` が作成されている
 - `docs/Reference/10_AuditAgentDesign.md` が作成されている
-- `agent/` 配下に 4 ツールが実装されている
-- 疑似ログを投入して、ブルートフォースなどのパターンが検出される
-- Markdown レポートが生成される
-- レポートに含まれる数値・固有名詞が、実際の入力データに存在することを確認できる（ハルシネーションが起きていない）
+- エージェントループが実装されている
+- 疑似ログを投入して、LLM がブルートフォースなどのパターンを検出し、対象ユーザー・IP を自動的に深掘りする
+- 入力データの内容によって LLM のツール呼び出し順が変わることを確認できる
+- ループが max_iterations を超えずに終了する
 
 ---
 
-## Phase 07: MCP サーバーの追加
+### Phase 14: Next.js SPA + PKCE 構成 ✅ 完了
 
-### 学ぶ動機
+**作成済みファイル:** `docs/11_SetupNextJsSPAWithPKCE.md`、`docs/Reference/08_PublicClientAndPKCE.md`、`apps/demo_web_spa/`
 
-MCP（Model Context Protocol）は AI エージェントと外部システムを接続するプロトコル。OAuth 2.1 と統合される設計になっており、`aud` 検証が中核的な防御策となる。
+---
 
-ここまでで認証/認可の基礎（Phase 00-04）、観測性（Phase 05）、AI エージェント実装（Phase 06）を経ているため、最後に「**最新の AI プロトコルにこれまでの IAM 知識を適用する**」総合演習として位置づけられる。
+### Phase 15: MCP サーバーの追加 🔲 未着手
 
-「OIDC 実装経験 × AI エージェント × 最新プロトコル」の三点セットは、転職市場での希少価値が極めて高い。
+**学ぶ動機:**
+MCP（Model Context Protocol）は OAuth 2.1 と統合される設計になっており、`aud` 検証が中核的な防御策になる。
+「OIDC 実装経験 × AI エージェント × 最新プロトコル」の三点セットは転職市場での希少価値が高い。
 
-### 実装すると何が分かるか
-
+**実装すると何が分かるか:**
 - `aud` 検証の重要性（confused deputy 問題の防御策として機能する）
 - OAuth 2.1 と PKCE の必須性
 - 複数 resource server 構成（同じ Keycloak から異なる `aud` の token を発行）
 
-### 作成するファイル
-
-- 新規: `docs/15_SetupMCPServer.md`
-- 新規: `docs/Reference/09_MCPAuthorizationFlow.md`
+**作成するファイル:**
+- 新規: `docs/21_SetupMCPServer.md`
+- 新規: `docs/Reference/11_MCPAuthorizationFlow.md`
 - 新規: `apps/demo_mcp/` 配下の実装ファイル
 
-### 主な扱う内容（ハンズオン）
-
+**主な扱う内容:**
 - `apps/demo_mcp/` の新規作成（FastAPI ベース）
 - echo ツール 1 本の実装
 - Keycloak に `demo-mcp` client を追加
 - Audience Mapper で `aud: demo-mcp` を付与
-- MCP クライアントからの接続確認
-- `aud` 検証が機能していることを確認
+- MCP クライアントからの接続確認と `aud` 検証の動作確認
+- Confused Deputy 問題の攻撃シナリオと防御策を Reference に整理
 
-### 主な扱う内容（Reference）
-
-- MCP プロトコルの概要
-- MCP × OAuth 2.1 の認可フロー（Discovery → DCR → Authorization Code + PKCE）
-- Resource Indicators (RFC 8707) と `aud` 固定
-- Confused Deputy 問題の攻撃シナリオと防御策
-
-### 想定する失敗例
-
-- `aud` が `demo-api` のまま → MCP サーバー側で `401`
-- PKCE の `code_verifier` 不一致
-- `redirect_uri` 不一致
-
-### 完了判定
-
-- `docs/15_SetupMCPServer.md` が作成されている
-- `docs/Reference/09_MCPAuthorizationFlow.md` が作成されている
+**完了判定:**
+- `docs/21_SetupMCPServer.md` が作成されている
+- `docs/Reference/11_MCPAuthorizationFlow.md` が作成されている
 - `apps/demo_mcp/` が起動し、`http://localhost:8002` でアクセスできる
-- Keycloak に `demo-mcp` client が登録され、`aud: demo-mcp` の token が発行される
-- 別の client（`demo-bff`）の token で MCP サーバーにアクセスすると `401` になる
+- `demo-bff` の token で MCP サーバーにアクセスすると `401` になる
 
 ---
 
-## 各 Phase 完了後にやること
+### Phase 16: Client Credentials Grant（M2M 認証） 🔲 未着手
 
-各 Phase 完了時には、以下も併せて更新する。
+**学ぶ動機:**
+これまでのフロー全体が「ユーザーがログインする」前提。実務ではバックグラウンドジョブやサービス間 API 呼び出しのように、ユーザーが介在しない Machine-to-Machine 認証が頻繁に登場する。
+最後に Authorization Code Flow との対比を置くことで、「どちらを使うべきか」の設計判断まで説明できる状態になる。
 
-- `docs/Reference/00_Glossary.md`: 新しく登場した用語を追加（例: `Hardcoded Claim Mapper`, `code_verifier`, `back-channel logout`, `span`, `Resource Indicator` など）
-- `docs/Reference/01_LocalStartup.md`: 新しく追加したアプリの起動方法を記載（Phase 03, 05, 06, 07 で更新）
-- このファイル（`ROADMAP.md`）のステータス: 🔲 → ✅ に変更
+**実装すると何が分かるか:**
+- Client Credentials grant のフローと token の中身（`sub` が service account になる）
+- service account の役割と権限設計
+- Authorization Code Flow との設計対比
+
+**作成するファイル:**
+- 新規: `docs/22_SetupClientCredentials.md`
+- 新規: `docs/Reference/12_MachineToMachineAuth.md`
+- 新規: `apps/demo_job/`（簡単なスクリプト）
+
+**主な扱う内容:**
+- Keycloak で `demo-job` client を作成し、service account を有効化する
+- `client_credentials` grant で token を取得する（httpx で token endpoint を直接叩く）
+- 取得した token で Backend API を呼び出す
+- token の中身を確認する（`sub` が service account の UUID になることを確認）
+- Authorization Code Flow との対比を Reference に整理する
+
+**想定する失敗例:**
+- service account を有効化していないと `unauthorized_client` が返る
+- `aud` 設定を忘れて `demo-job` 向けの token が Backend API の検証を通過してしまう
+
+**完了判定:**
+- `docs/22_SetupClientCredentials.md` が作成されている
+- `apps/demo_job/` のスクリプトが token を取得して Backend API を呼び出せる
+- token の `sub` が service account であることを確認できる
+- Reference で Authorization Code Flow との設計対比が説明されている
 
 ---
 
 ## 転職活動（6〜7月）との対応
 
-現在地: **Phase 04 完了 / Phase 05 着手前**
+現在地: **OTel 計装完了 / Phase 13（Security Audit Agent）着手前**
 
 ```
-                     現在 ─────── 6月中旬 ────── 6月下旬 ────── 7月（活動開始）
-                       │             │              │
-✅ Phase 00-01 完了    Phase 02     Phase 03-04    Phase 05
-（aud + scope/mapper）（JWTテスト）（SPA + lifecycle）（観測性）
+                     現在 ─────── 6月下旬 ────── 7月（活動開始）
+                       │             │
+✅ IAM 基盤完成        Phase 13     Phase 15
+（BFF + SPA + OTel）  （Audit Agent）（MCP）
 
-                                                   ↓
-                                            Phase 06-07（応用/AI）
-                                            活動と並行 or 転職後継続
+                       ↓
+                Phase 01/02 補完（Public Readiness + Quality Baseline）
+                転職活動と並行
 ```
 
-- **Phase 02 完了時点**: OIDC/OAuth2 を「実装＋テストで検証」した状態として既に強い
-- **Phase 04 完了時点**: BFF / SPA 両構成 + token ライフサイクル完結。OIDC/OAuth2 の **基礎一式** が揃う
-- **Phase 05 完了時点**: 動く認証基盤 + 観測できる認証基盤。DevSecOps 寄りのアピールが可能になる
-- **Phase 06-07**: 転職活動と並行、または転職後の継続学習として位置づけられる
+- **現時点**: OIDC/OAuth2 実装 + OTel 計装済み。BFF / SPA 両構成 + token ライフサイクル完結
+- **Phase 13 完了時点**: 認証基盤 + 観測性 + LLM エージェント設計。DevSecOps 寄りのアピールが可能になる
+- **Phase 15 完了時点**: IAM × AI × 最新プロトコル（MCP）の三点セット
+- **Phase 01/02**: 転職活動と並行して Public Readiness / Quality Baseline を補完する
+
+---
+
+## 各 Phase 完了後にやること
+
+- `docs/Reference/00_Glossary.md`: 新しく登場した用語を追加
+- `docs/Reference/01_LocalStartup.md`: 新しく追加したアプリの起動方法を記載
+- `ROADMAP.md` のステータスを更新する
+
+---
+
+## 未解決の判断事項
+
+| 判断事項 | 選択肢 | 現時点の暫定方針 |
+|---|---|---|
+| Phase 09（Keycloak Config as Code）の位置 | 含める / 先送り | 含めるが後半に置く |
+| Phase 10・11（SSE / WebSocket）の必要性 | 含める / 先送り | 応用テーマとして含めるが低優先 |
+| Phase 13（Audit Agent）の LLM プロバイダー | Anthropic API / OpenAI / その他 | Anthropic API（Claude）を使用する |
+
+---
+
+## 短期マイルストーン
+
+### Milestone 1: Public Readiness（Phase 01 残作業）
+
+LICENSE・`.env.example`・README 刷新・絶対パスリンク修正を完了させる。
+
+### Milestone 2: Quality Baseline 補完（Phase 02 残作業）
+
+lint / format 設定と基本 route test を追加して CI を完備させる。
+
+### Milestone 3: IAM 深掘り（Phase 05〜08）
+
+Client Role 設計・Session/Token Lifetime・Cookie Security（Refresh & Logout は完了済み）。
+
+### Milestone 4: 応用拡張（Phase 09〜16）
+
+Keycloak Config as Code・SSE・WebSocket・OTel・Audit Agent・MCP・M2M 認証。
 
 ---
 
@@ -520,8 +558,8 @@ MCP（Model Context Protocol）は AI エージェントと外部システムを
 Claude Code に依頼するときは、以下のテンプレートを使う。
 
 ```
-ROADMAP.md の Phase XX を実装してください。
-ROADMAP.md の該当 Phase に記載されている「作成するファイル」「主な扱う内容」「想定する失敗例」「完了判定」に従って、必要なファイルを作成してください。
+ROADMAP の Phase XX を実装してください。
+該当 Phase に記載されている「作成するファイル」「主な扱う内容」「想定する失敗例」「完了判定」に従って、必要なファイルを作成してください。
 
 既存の docs/ の文体（既存の docs/05〜08 を参照）と Reference の文体（既存の Reference/02, 04 を参照）に揃えてください。
 
@@ -532,6 +570,6 @@ ROADMAP.md の該当 Phase に記載されている「作成するファイル�
 
 ## 関連ドキュメント
 
-- 既存の docs/ 全体
-- 既存の docs/Reference/ 全体
-- 既存の docs/_TEMPLATE.md（新規 docs の雛形）
+- `docs/` 全体
+- `docs/Reference/` 全体
+- `docs/_TEMPLATE.md`
