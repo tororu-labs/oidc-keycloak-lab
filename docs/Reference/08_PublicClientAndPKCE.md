@@ -92,7 +92,7 @@ SPA で token を保管する場所として、主に 3 つの選択肢がある
 
 **このラボでの選択**
 
-`demo-web-spa` では access token をメモリ（React state）に保管する。XSS への耐性が最も高いが、ページリロードで消えてしまう。実運用では refresh token と組み合わせて、リロード後も再ログインなしで使い続けられるようにすることが多い（Phase 04 で扱う）。
+`demo-web-spa` では access token をメモリ（React state）に保管する。XSS への耐性が最も高いが、ページリロードで消えてしまう。このラボの SPA は refresh token を持たず、リロード後は再ログインする構成とする。Refresh Token の自動更新は BFF に限定し、[12_SetupRefreshAndLogout.md](../12_SetupRefreshAndLogout.md) で扱う。
 
 **`code_verifier` だけは sessionStorage に置く理由**
 

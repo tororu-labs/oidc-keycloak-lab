@@ -267,5 +267,4 @@ export SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(
 - [01_LocalStartup.md](./Reference/01_LocalStartup.md) を参照
 - [02_AuthFlowArchitecture.md](./Reference/02_AuthFlowArchitecture.md) を参照
 - [03_Troubleshooting.md](./Reference/03_Troubleshooting.md) を参照
-- [MEMO_失敗系の状態遷移.md](../notes/04_OIDC/MEMO_失敗系の状態遷移.md) を参照
 - [main.py](../apps/demo_bff/main.py) を参照

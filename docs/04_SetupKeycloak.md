@@ -9,7 +9,7 @@
 - `alice` と `bob` を作成し、異なる role を割り当てる
 - `demo-web` client を作成し、token の差分を確認できるようにする
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
+必要な用語は [00_Glossary.md](Reference/00_Glossary.md) を参照する。
 
 ------
 
@@ -86,7 +86,7 @@ Keycloak 管理コンソールへログインしたら、左上の realm 切り�
 
 補足:
 
-- role や token の関係は [04_ClientAndTokenRoles.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/04_ClientAndTokenRoles.md) を参照する
+- role や token の関係は [04_ClientAndTokenRoles.md](Reference/04_ClientAndTokenRoles.md) を参照する
 
 ------
 
@@ -189,7 +189,7 @@ Valid post logout redirect URIs: http://localhost/*
 
 補足:
 
-- `demo-web` と `demo-bff` の違いは [04_ClientAndTokenRoles.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/04_ClientAndTokenRoles.md) を参照する
+- `demo-web` と `demo-bff` の違いは [04_ClientAndTokenRoles.md](Reference/04_ClientAndTokenRoles.md) を参照する
 
 ------
 
@@ -230,8 +230,7 @@ bob の access token
 
 補足:
 
-- 詳しい差分は [MEMO_CompareTokensUsers.md](/Users/tororu/workspace/labs/iam-lab-study/notes/03_Keycloak/MEMO_CompareTokensUsers.md) を参照する
-- token、role、claim の関係は [04_ClientAndTokenRoles.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/04_ClientAndTokenRoles.md) を参照する
+- token、role、claim の関係は [04_ClientAndTokenRoles.md](Reference/04_ClientAndTokenRoles.md) を参照する
 
 ------
 
@@ -270,7 +269,7 @@ docker compose -f infra/keycloak/docker-compose.yml ps # 起動状態を確認
 - `demo-web` client を作成し、token の差分を確認した
 
 ここまでで、Keycloak の管理コンソールだけで認証・認可の基本要素を一通り作成して確認できた。  
-次は [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md) を参照し、実際の Web アプリからログインして token を利用する流れを確認する。
+次は [05_SetupFastAPI-OIDCLogin.md](05_SetupFastAPI-OIDCLogin.md) を参照し、実際の Web アプリからログインして token を利用する流れを確認する。
 
 ------
 
@@ -279,4 +278,3 @@ docker compose -f infra/keycloak/docker-compose.yml ps # 起動状態を確認
 - [03_SetupDocker-Keycloak.md](./03_SetupDocker-Keycloak.md) を参照
 - [05_SetupFastAPI-OIDCLogin.md](./05_SetupFastAPI-OIDCLogin.md) を参照
 - [04_ClientAndTokenRoles.md](./Reference/04_ClientAndTokenRoles.md) を参照
-- [MEMO_CompareTokensUsers.md](../notes/03_Keycloak/MEMO_CompareTokensUsers.md) を参照

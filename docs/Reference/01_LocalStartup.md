@@ -257,6 +257,6 @@ docker compose -f infra/otel/docker-compose.yml down
 
 ## 関連ドキュメント
 
-- [03_SetupDocker-Keycloak.md](/Users/tororu/workspace/labs/iam-lab-study/docs/03_SetupDocker-Keycloak.md)
-- [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md)
-- [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md)
+- [03_SetupDocker-Keycloak.md](../03_SetupDocker-Keycloak.md)
+- [05_SetupFastAPI-OIDCLogin.md](../05_SetupFastAPI-OIDCLogin.md)
+- [06_SetupFastAPI-BackendAPI.md](../06_SetupFastAPI-BackendAPI.md)

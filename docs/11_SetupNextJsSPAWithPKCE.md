@@ -46,7 +46,7 @@ BFF 構成（`demo-bff`）では、token はサーバ側 session に留まり、
 - `docs/08_SetupAudienceValidation.md` の手順が完了している
 - Keycloak が `http://localhost:8080` で起動している
 - `apps/demo_api/` が `http://localhost:8001` で起動している
-- Node.js（18 以上）がインストールされている
+- Node.js（20.9 以上）がインストールされている
 
 判定:
 
@@ -211,7 +211,7 @@ NEXT_PUBLIC_BACKEND_API_BASE_URL=http://localhost:8001
 
 ~~~zsh
 cd apps/demo_web_spa
-npm install
+npm ci
 npm run dev
 ~~~
 
@@ -381,7 +381,7 @@ Keycloak の `demo-web-spa` client の **Settings** タブで **Valid Redirect U
 - ブラウザから Backend API を直接呼び出し、BFF を経由しない Bearer アクセスを確認した
 - BFF 構成との挙動の違い（token の場所・CORS・リロード時の挙動）を比較した
 
-次のステップ（Phase 04）では、この SPA に Refresh Token と Back-channel Logout を追加する。access token が切れたときに自動で再取得し、Keycloak 側でセッションを終了したときに SPA 側も即座に無効化される仕組みを実装する。
+次は [12_SetupRefreshAndLogout.md](./12_SetupRefreshAndLogout.md) を参照し、BFF での Refresh Token と Back-Channel Logout を確認する。SPA は refresh token を持たず、Access Token の期限切れ後は再ログインが必要な構成のままとし、BFF との違いを比較する。
 
 ------
 
