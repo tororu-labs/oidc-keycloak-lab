@@ -1,4 +1,4 @@
-name: iam-lab-study-otel
+name: oidc-keycloak-lab-otel
 
 services:
   jaeger:
