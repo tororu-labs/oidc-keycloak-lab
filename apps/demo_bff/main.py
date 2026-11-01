@@ -14,9 +14,9 @@ from config import load_settings
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from opentelemetry import trace
-from telemetry import setup_telemetry
 from session_store import InMemorySessionStore
 from starlette.middleware.sessions import SessionMiddleware
+from telemetry import setup_telemetry
 from views import (
     render_admin_page,
     render_backend_result_page,

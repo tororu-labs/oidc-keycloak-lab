@@ -134,7 +134,7 @@
 
 - `bff_*` で始まるものは、BFF 内で止まっていることを示す
 - `backend_*` や `keycloak_jwks` は、Backend API まで到達したあとの失敗を示す
-- 実際の再現手順は [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md) を参照する
+- 実際の再現手順は [06_SetupFastAPI-BackendAPI.md](../06_SetupFastAPI-BackendAPI.md) を参照する
 
 ------
 
@@ -237,7 +237,7 @@ GUI とアプリ側の両方で同じ realm を見ているかを最初にそろ
 - 対象 user と対象 client を正しく見ているか
 - API 側が `realm_access.roles` を期待しているか
 
-ユーザー差分や role の見え方は [04_ClientAndTokenRoles.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/04_ClientAndTokenRoles.md) を参照する。
+ユーザー差分や role の見え方は [04_ClientAndTokenRoles.md](04_ClientAndTokenRoles.md) を参照する。
 
 ------
 
@@ -322,5 +322,5 @@ Role mappings で設定を見て、Token Evaluate で token 出力を見比べ�
 
 ## 関連ドキュメント
 
-- [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md)
-- [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md)
+- [05_SetupFastAPI-OIDCLogin.md](../05_SetupFastAPI-OIDCLogin.md)
+- [06_SetupFastAPI-BackendAPI.md](../06_SetupFastAPI-BackendAPI.md)

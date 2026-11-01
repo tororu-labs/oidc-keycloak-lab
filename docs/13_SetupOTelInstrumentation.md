@@ -298,7 +298,7 @@ docker compose -f infra/otel/docker-compose.yml down
 - redaction processor により、Collector 側で PII（email）を一元的にマスクできる
 
 ここまでで、「動く認証基盤」に観測性を加えた状態になった。  
-次は Phase 06（セキュリティ監査エージェント）または Phase 07（MCP サーバー）を進める。
+次は [ROADMAP.md](../ROADMAP.md) の Active Roadmap を参照し、OIDC / BFF のセキュリティ境界を順番に整理する。
 
 ------
 

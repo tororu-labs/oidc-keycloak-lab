@@ -9,7 +9,7 @@
 - ローカルにリポジトリを clone し、初期ディレクトリ構成を作成する
 - 初回 commit / push まで完了する
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
+必要な用語は [00_Glossary.md](Reference/00_Glossary.md) を参照する。
 
 ------
 
@@ -29,16 +29,16 @@
 
 ## GitHub リポジトリ作成（GitHubのWeb側で作業）
 
-- Repository name: `iam-lab-study`
-- Visibility: `Private`
+- Repository name: `oidc-keycloak-lab`
+- Visibility: `Public`
 - README: 作成
 - `.gitignore`: 作成
-- License: 追加しない
+- License: MIT License
 
 判定:
 
 - GitHub 上にリポジトリが作成されている
-- `README.md` と `.gitignore` を含む初回コミットが存在している
+- `README.md`、`.gitignore`、`LICENSE` を含む初回コミットが存在している
 
 ------
 
@@ -172,8 +172,8 @@ cd ~/projects
 ~~~
 
 ~~~zsh
-git clone git@github.com:tororu-labs/iam-lab-study.git
-cd iam-lab-study
+git clone git@github.com:tororu-labs/oidc-keycloak-lab.git
+cd oidc-keycloak-lab
 ~~~
 
 ~~~zsh
@@ -196,8 +196,8 @@ ls -la
 IAM ラボの用途ごとにディレクトリを分けるため、以下を作成した。
 
 ~~~zsh
-mkdir -p docs notes apps infra scratch
-touch docs/.gitkeep notes/.gitkeep apps/.gitkeep infra/.gitkeep scratch/.gitkeep
+mkdir -p docs apps infra
+touch docs/.gitkeep apps/.gitkeep infra/.gitkeep
 ~~~
 
 補足:
@@ -205,14 +205,12 @@ touch docs/.gitkeep notes/.gitkeep apps/.gitkeep infra/.gitkeep scratch/.gitkeep
 - `.gitkeep` は、Git が空のディレクトリを管理できないため、空のフォルダを残すために置いている
 
 ~~~text
-iam-lab-study/
+oidc-keycloak-lab/
 ├── README.md
 ├── .gitignore
 ├── docs/
-├── notes/
 ├── apps/
-├── infra/
-└── scratch/
+└── infra/
 ~~~
 
 判定:
@@ -223,15 +221,10 @@ iam-lab-study/
 
 - `docs/`
   - Setup と Reference を置く
-- `notes/`
-  - 学習メモ、理解メモ、調査メモ
 - `apps/`
   - FastAPI などの検証アプリ
 - `infra/`
   - Keycloak、DB、Docker Compose などの構成ファイル
-- `scratch/`
-  - 一時作業用の置き場
-  - commit 前に中身を確認し、残したいものだけを管理する想定
 
 ------
 
@@ -292,11 +285,11 @@ ssh -T git@github.com #SSH 接続確認
 ~~~zsh
 mkdir -p ~/projects #作業用ディレクトリ作成
 cd ~/projects #作業ディレクトリに移動
-git clone git@github.com:tororu-labs/iam-lab-study.git #リポジトリをローカルに clone
-cd iam-lab-study #リポジトリディレクトリに移動
+git clone git@github.com:tororu-labs/oidc-keycloak-lab.git #リポジトリをローカルに clone
+cd oidc-keycloak-lab #リポジトリディレクトリに移動
 
-mkdir -p docs notes apps infra scratch #初期ディレクトリ構成の作成
-touch docs/.gitkeep notes/.gitkeep apps/.gitkeep infra/.gitkeep scratch/.gitkeep #用途ごとのディレクトリの作成
+mkdir -p docs apps infra #初期ディレクトリ構成の作成
+touch docs/.gitkeep apps/.gitkeep infra/.gitkeep #用途ごとのディレクトリの作成
 
 git status #状態確認
 git add . #変更をステージング（実行前に git status で対象を確認）
@@ -327,7 +320,7 @@ git push origin main #変更をリモートに push
 - 初回 commit / push を完了した
 
 ここまでで、IAM Study Lab の開発と学習を始めるための Git / GitHub 環境を用意できた。  
-次は [02_SetupVenv.md](/Users/tororu/workspace/labs/iam-lab-study/docs/02_SetupVenv.md) を参照し、Python の実行環境を整える。
+次は [02_SetupVenv.md](02_SetupVenv.md) を参照し、Python の実行環境を整える。
 
 ------
 

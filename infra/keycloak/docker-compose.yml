@@ -1,4 +1,4 @@
-name: iam-lab-study-keycloak
+name: oidc-keycloak-lab-keycloak
 
 services:
   postgres:

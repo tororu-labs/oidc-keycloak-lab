@@ -8,7 +8,7 @@
 - 仮想環境を有効化できる
 - VSCode で `.venv` を使う設定を整える
 
-必要な用語は [00_Glossary.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/00_Glossary.md) を参照する。
+必要な用語は [00_Glossary.md](Reference/00_Glossary.md) を参照する。
 
 ------
 
@@ -45,7 +45,7 @@ python3 --version
 プロジェクトのルートディレクトリへ移動し、`.venv` という名前で仮想環境を作成した。
 
 ~~~zsh
-cd ~/workspace/labs/iam-lab-study
+cd ~/workspace/labs/oidc-keycloak-lab
 python3 -m venv .venv
 ~~~
 
@@ -90,11 +90,11 @@ VSCode を開き、プロジェクトの仮想環境を利用するようにイ�
 - プロジェクトのルートディレクトリをワークスペースとして開く
 - コマンドパレットを開く
 - `Python: Select Interpreter` を選択する
-- `iam-lab-study/.venv/bin/python` を選択する
+- `oidc-keycloak-lab/.venv/bin/python` を選択する
 
 判定:
 
-- VSCode で `iam-lab-study/.venv/bin/python` を選択できる
+- VSCode で `oidc-keycloak-lab/.venv/bin/python` を選択できる
 
 ------
 
@@ -131,7 +131,7 @@ EOF
 
 ~~~zsh
 python3 --version # Python 3 の利用確認
-cd ~/workspace/labs/iam-lab-study # プロジェクトルートへ移動
+cd ~/workspace/labs/oidc-keycloak-lab # プロジェクトルートへ移動
 python3 -m venv .venv # 仮想環境の作成
 source .venv/bin/activate # 仮想環境の有効化
 which python # 使用中の Python 確認
@@ -168,7 +168,7 @@ mkdir -p .vscode # VSCode 設定ディレクトリの作成
 - VSCode で `.venv` を使う設定を整えた
 
 ここまでで、IAM Study Lab の Python 実行環境を用意できた。  
-次は [03_SetupDocker-Keycloak.md](/Users/tororu/workspace/labs/iam-lab-study/docs/03_SetupDocker-Keycloak.md) を参照し、Keycloak のローカル起動環境を整える。
+次は [03_SetupDocker-Keycloak.md](03_SetupDocker-Keycloak.md) を参照し、Keycloak のローカル起動環境を整える。
 
 ------
 

@@ -54,3 +54,23 @@ jobs:
         run: mypy .
       - name: Test
         run: pytest tests/
+
+  demo_web_spa:
+    name: demo_web_spa
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/demo_web_spa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/demo_web_spa/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+      - name: Build
+        run: npm run build

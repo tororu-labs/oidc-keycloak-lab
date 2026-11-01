@@ -104,6 +104,6 @@ Keycloak GUI では、次を比べると追いやすい。
 
 ## 関連ドキュメント
 
-- [04_SetupKeycloak.md](/Users/tororu/workspace/labs/iam-lab-study/docs/04_SetupKeycloak.md)
-- [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md)
-- [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md)
+- [04_SetupKeycloak.md](../04_SetupKeycloak.md)
+- [05_SetupFastAPI-OIDCLogin.md](../05_SetupFastAPI-OIDCLogin.md)
+- [06_SetupFastAPI-BackendAPI.md](../06_SetupFastAPI-BackendAPI.md)

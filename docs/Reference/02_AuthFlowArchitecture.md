@@ -129,7 +129,7 @@ Backend API
 - `/api/*` で止まる
   - Backend API 到達性や JWT 検証、role 判定を疑う
 
-この切り分けは [03_Troubleshooting.md](/Users/tororu/workspace/labs/iam-lab-study/docs/Reference/03_Troubleshooting.md) で詳しく扱う。
+この切り分けは [03_Troubleshooting.md](03_Troubleshooting.md) で詳しく扱う。
 
 ------
 
@@ -143,5 +143,5 @@ Backend API
 
 ## 関連ドキュメント
 
-- [05_SetupFastAPI-OIDCLogin.md](/Users/tororu/workspace/labs/iam-lab-study/docs/05_SetupFastAPI-OIDCLogin.md)
-- [06_SetupFastAPI-BackendAPI.md](/Users/tororu/workspace/labs/iam-lab-study/docs/06_SetupFastAPI-BackendAPI.md)
+- [05_SetupFastAPI-OIDCLogin.md](../05_SetupFastAPI-OIDCLogin.md)
+- [06_SetupFastAPI-BackendAPI.md](../06_SetupFastAPI-BackendAPI.md)

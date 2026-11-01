@@ -740,7 +740,7 @@ PASSED tests/test_auth.py::test_wrong_issuer
 - `exp` 欠落は joserfc のデフォルトでは検証されない。必要なら `JWTClaimsRegistry` で必須化する
 
 ここまでで、「実装して終わり」ではなく「異常系も押さえた」状態になった。  
-次は Phase 03: Next.js SPA + PKCE 構成を進める。
+次は [11_SetupNextJsSPAWithPKCE.md](./11_SetupNextJsSPAWithPKCE.md) を参照し、Next.js SPA + PKCE 構成を確認する。
 
 ------
 

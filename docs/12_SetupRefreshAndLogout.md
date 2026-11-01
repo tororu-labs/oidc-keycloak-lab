@@ -32,7 +32,7 @@
 この手順を始める前に、以下が完了していることを確認する。
 
 - `docs/08_SetupAudienceValidation.md` の手順が完了している
-- `docs/11_SetupNextJsSPAWithPKCE.md` の手順が完了している（BFF に refresh_token 保管の実装が含まれている）
+- `docs/11_SetupNextJsSPAWithPKCE.md` の手順が完了している（SPA と BFF の token 保管場所を比較できる状態）
 - `demo-bff` client が `http://localhost:8080` の `lab` realm に存在する
 - BFF と Backend API を起動してログインできる状態になっている
 
@@ -322,7 +322,7 @@ curl -X POST http://localhost:8000/backchannel-logout \
 - logout token の署名検証により、外部から session を不正に削除させることができないことを確認した
 
 ここまでで、BFF が token のライフサイクルを適切に管理できる状態になった。
-次は OpenTelemetry による認証フローの可視化（Phase 05）に進む。
+次は [13_SetupOTelInstrumentation.md](./13_SetupOTelInstrumentation.md) を参照し、OpenTelemetry による認証フローの可視化を確認する。
 
 ------
 
